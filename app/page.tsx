@@ -7,7 +7,7 @@ export default function Home() {
       <header className="py-5">
         <div className="flex items-center gap-1.5">
           <Logo className="size-4" />
-          <span className="text-sm font-medium tracking-tight">NodeJourney</span>
+          <span className="text-[15px] font-semibold tracking-tight">Nodejourney</span>
         </div>
       </header>
       <main className="space-y-24 mt-16">
