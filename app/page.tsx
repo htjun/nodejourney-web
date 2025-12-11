@@ -1,5 +1,5 @@
+import { CtaButton } from '@/components/cta-button'
 import { Logo } from '@/components/icons/logo'
-import { cn } from '@/lib/utils'
 
 export default function Home() {
   return (
@@ -16,23 +16,8 @@ export default function Home() {
             AI image gen canvas with no backend, no logins, no subs. <br />
             Use your own keys and save projects as files.
           </h1>
-          <div className="flex items-center gap-4">
-            <button
-              className={cn(
-                'group relative w-fit overflow-hidden',
-                'rounded-full py-3 px-6',
-                'font-medium text-white bg-stone-900',
-                'transition-all duration-300 cursor-pointer',
-                // Default shadow
-                'shadow-[0_8px_20px_-8px_rgba(120,113,108,0.5),inset_0_1px_2px_rgba(250,250,249,0.1)]',
-                // Hover states
-                'hover:bg-orange-600',
-                'hover:shadow-[0_18px_40px_-15px_rgba(234,88,12,0.85),inset_0_8px_12px_rgba(255,247,237,0.5)]'
-              )}
-            >
-              <div className="group-hover:translate-y-0 group-hover:opacity-0 transition-all duration-300 bg-white/10 absolute inset-0 translate-y-full" />
-              <span className="flex items-center gap-2 relative">Download for macOS</span>
-            </button>
+          <div className="flex items-center gap-6">
+            <CtaButton size="md">Download for macOS</CtaButton>
             <small className="text-stone-400">v0.1.0-beta</small>
           </div>
         </section>
