@@ -10,7 +10,7 @@ export default function Home() {
           <span className="text-[15px] font-semibold tracking-tight">Nodejourney</span>
         </div>
       </header>
-      <main className="space-y-24 mt-16">
+      <main className="space-y-24 py-16">
         <section className="flex flex-col gap-12">
           <h1 className="text-2xl">
             AI image gen canvas with no backend, no logins, no subs. <br />
@@ -18,19 +18,18 @@ export default function Home() {
           </h1>
           <div className="flex items-center gap-6">
             <CtaButton size="md">Download for macOS</CtaButton>
-            <small className="text-stone-400">v0.1.0-beta</small>
+            <small className="text-stone-400">v0.1.0</small>
           </div>
         </section>
         <section className="aspect-video bg-stone-200 grid place-items-center rounded-xs">
           <span className="text-sm text-stone-400">placeholder for image</span>
         </section>
         <section>
-          <aside>
-            <ul>
-              <li></li>
-            </ul>
-          </aside>
-          <div></div>
+          <ul className="flex flex-col gap-2 text-lg">
+            <li>What is it?</li>
+            <li>What's the catch?</li>
+            <li>Is it free?</li>
+          </ul>
         </section>
       </main>
     </div>

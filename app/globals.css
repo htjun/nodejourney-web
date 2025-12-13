@@ -3,6 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Add dreamy gradient animation keyframes */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 @theme inline {
   --text-compact: 13px;
 
@@ -46,7 +59,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(97.3% 0.007 100);
+  --background: oklch(96% 0.008 100);
   --foreground: oklch(0.147 0.004 49.25);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.147 0.004 49.25);
