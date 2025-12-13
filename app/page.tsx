@@ -25,9 +25,9 @@ export default function Home() {
       </header>
       <main className="space-y-24 py-16">
         <section className="flex flex-col gap-12">
-          <h1 className="text-2xl">
-            AI image gen canvas with no backend, no logins, no subs. <br />
-            Use your own keys and save projects as files.
+          <h1 className="text-2xl max-w-[600px]">
+            AI image gen canvas with no backend, no logins, no subs. Use your own keys and save
+            projects as files.
           </h1>
           <div className="flex items-center gap-6">
             <CtaButton size="md">Download for macOS</CtaButton>
@@ -45,7 +45,7 @@ export default function Home() {
         </section>
         <section className="space-y-8">
           <h2 className="text-2xl">What you're getting</h2>
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <FeatureBox
               title="Visual workflows"
               description="Build AI pipelines on an infinite canvas. Connect text, JSON, and image nodes to prototype ideas without code."
