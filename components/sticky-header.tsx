@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react'
 import { Logo } from '@/components/icons/logo'
 import { CtaButton } from '@/components/cta-button'
 
-export function StickyHeader() {
+type StickyHeaderProps = {
+  downloadUrl?: string
+}
+
+export function StickyHeader({ downloadUrl }: StickyHeaderProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -33,7 +37,9 @@ export function StickyHeader() {
           <Logo className="size-4" />
           <span className="text-[15px] font-semibold tracking-tight">Nodejourney</span>
         </div>
-        <CtaButton size="xs">Download for macOS</CtaButton>
+        <CtaButton size="xs" href={downloadUrl}>
+          Download for macOS
+        </CtaButton>
       </div>
     </div>
   )

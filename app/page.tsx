@@ -4,6 +4,7 @@ import { FeatureBox } from '@/components/feature-box'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import { StickyHeader } from '@/components/sticky-header'
+import { getLatestRelease } from '@/lib/releases'
 
 const FEATURES = [
   {
@@ -38,10 +39,12 @@ const FEATURES = [
   },
 ] as const
 
-export default function Home() {
+export default async function Home() {
+  const release = await getLatestRelease()
+
   return (
     <>
-      <StickyHeader />
+      <StickyHeader downloadUrl={release?.downloadUrl} />
       <div className="flex flex-col min-h-screen w-full max-w-7xl mx-auto items-stretch px-4">
         <Header />
         <main className="space-y-24 py-16">
@@ -50,8 +53,11 @@ export default function Home() {
               AI image gen canvas with no backend, no logins, no subs. Use your own keys and save
               projects as files.
             </h1>
-            <div id="hero-cta" className="flex flex-col items-start gap-2">
-              <CtaButton size="md">Download for macOS</CtaButton>
+            <div id="hero-cta" className="flex items-center gap-6">
+              <CtaButton size="md" href={release?.downloadUrl}>
+                Download for macOS
+              </CtaButton>
+              {release && <small className="text-gray-400">{release.version}</small>}
             </div>
           </section>
           <section>

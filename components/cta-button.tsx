@@ -11,6 +11,7 @@ interface CtaButtonProps {
   onClick?: () => void
   className?: string
   size?: ButtonSize
+  href?: string
 }
 
 const sizeStyles = {
@@ -20,52 +21,58 @@ const sizeStyles = {
   xs: 'px-4 py-1.5 text-sm',
 }
 
-export function CtaButton({ children, onClick, className, size = 'default' }: CtaButtonProps) {
+export function CtaButton({
+  children,
+  onClick,
+  className,
+  size = 'default',
+  href,
+}: CtaButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const anchorRef = useRef<HTMLAnchorElement>(null)
 
-  const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
-    if (!buttonRef.current) return
-    const rect = buttonRef.current.getBoundingClientRect()
+  const handleMouseMove = (e: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    const ref = href ? anchorRef.current : buttonRef.current
+    if (!ref) return
+    const rect = ref.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
-    buttonRef.current.style.setProperty('--mouse-x', `${x}%`)
-    buttonRef.current.style.setProperty('--mouse-y', `${y}%`)
+    ref.style.setProperty('--mouse-x', `${x}%`)
+    ref.style.setProperty('--mouse-y', `${y}%`)
 
     const rotateY = ((x - 50) / 50) * 12
     const rotateX = ((50 - y) / 50) * 8
-    buttonRef.current.style.setProperty('--rotate-x', `${rotateX}deg`)
-    buttonRef.current.style.setProperty('--rotate-y', `${rotateY}deg`)
+    ref.style.setProperty('--rotate-x', `${rotateX}deg`)
+    ref.style.setProperty('--rotate-y', `${rotateY}deg`)
   }
 
   const handleMouseLeave = () => {
-    if (!buttonRef.current) return
-    buttonRef.current.style.setProperty('--rotate-x', '0deg')
-    buttonRef.current.style.setProperty('--rotate-y', '0deg')
+    const ref = href ? anchorRef.current : buttonRef.current
+    if (!ref) return
+    ref.style.setProperty('--rotate-x', '0deg')
+    ref.style.setProperty('--rotate-y', '0deg')
   }
 
-  return (
-    <button
-      ref={buttonRef}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={cn(
-        'group dreamy-button relative overflow-hidden rounded-full font-medium text-white cursor-pointer',
-        sizeStyles[size],
-        'transition-all duration-300 ease-out',
-        'hover:scale-[1.04] active:scale-[0.97] active:translate-y-[3px] hover:shadow-2xl/20',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/50 focus-visible:ring-offset-2',
-        className
-      )}
-      style={{
-        ['--mouse-x' as string]: '50%',
-        ['--mouse-y' as string]: '50%',
-        ['--rotate-x' as string]: '0deg',
-        ['--rotate-y' as string]: '0deg',
-        transform: 'perspective(800px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))',
-        transformStyle: 'preserve-3d',
-      }}
-    >
+  const sharedClassName = cn(
+    'group dreamy-button relative overflow-hidden rounded-full font-medium text-white cursor-pointer inline-block',
+    sizeStyles[size],
+    'transition-all duration-300 ease-out',
+    'hover:scale-[1.04] active:scale-[0.97] active:translate-y-[3px] hover:shadow-2xl/20',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/50 focus-visible:ring-offset-2',
+    className
+  )
+
+  const sharedStyle = {
+    ['--mouse-x' as string]: '50%',
+    ['--mouse-y' as string]: '50%',
+    ['--rotate-x' as string]: '0deg',
+    ['--rotate-y' as string]: '0deg',
+    transform: 'perspective(800px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))',
+    transformStyle: 'preserve-3d' as const,
+  }
+
+  const innerContent = (
+    <>
       {/* Shadow layer */}
       <span
         className={cn(
@@ -110,6 +117,34 @@ export function CtaButton({ children, onClick, className, size = 'default' }: Ct
       <span className="relative z-10 transition-colors duration-500 text-white group-hover:text-[#19196a]/90">
         {children}
       </span>
+    </>
+  )
+
+  if (href) {
+    return (
+      <a
+        ref={anchorRef}
+        href={href}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className={sharedClassName}
+        style={sharedStyle}
+      >
+        {innerContent}
+      </a>
+    )
+  }
+
+  return (
+    <button
+      ref={buttonRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={sharedClassName}
+      style={sharedStyle}
+    >
+      {innerContent}
     </button>
   )
 }
