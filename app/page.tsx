@@ -3,6 +3,7 @@ import { CtaButton } from '@/components/cta-button'
 import { FeatureBox } from '@/components/feature-box'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
+import { StickyHeader } from '@/components/sticky-header'
 
 const FEATURES = [
   {
@@ -39,41 +40,44 @@ const FEATURES = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-7xl mx-auto items-stretch px-4">
-      <Header />
-      <main className="space-y-24 py-16">
-        <section className="flex flex-col gap-12">
-          <h1 className="text-2xl max-w-[600px]">
-            AI image gen canvas with no backend, no logins, no subs. Use your own keys and save
-            projects as files.
-          </h1>
-          <div className="flex flex-col items-start gap-2">
-            <CtaButton size="md">Download for macOS</CtaButton>
-          </div>
-        </section>
-        <section>
-          <Image
-            src="/images/app-01.jpg"
-            alt="NodeJourney app screenshot"
-            width={1400}
-            height={900}
-            className="rounded-xs"
-          />
-        </section>
-        <section className="space-y-8">
-          <h2 className="text-2xl">What you're getting</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((feature) => (
-              <FeatureBox
-                key={feature.title}
-                title={feature.title}
-                description={feature.description}
-              />
-            ))}
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+    <>
+      <StickyHeader />
+      <div className="flex flex-col min-h-screen w-full max-w-7xl mx-auto items-stretch px-4">
+        <Header />
+        <main className="space-y-24 py-16">
+          <section className="flex flex-col gap-12">
+            <h1 className="text-2xl max-w-[600px]">
+              AI image gen canvas with no backend, no logins, no subs. Use your own keys and save
+              projects as files.
+            </h1>
+            <div id="hero-cta" className="flex flex-col items-start gap-2">
+              <CtaButton size="md">Download for macOS</CtaButton>
+            </div>
+          </section>
+          <section>
+            <Image
+              src="/images/app-01.jpg"
+              alt="NodeJourney app screenshot"
+              width={1400}
+              height={900}
+              className="rounded-xs"
+            />
+          </section>
+          <section className="space-y-8">
+            <h2 className="text-2xl">What you're getting</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {FEATURES.map((feature) => (
+                <FeatureBox
+                  key={feature.title}
+                  title={feature.title}
+                  description={feature.description}
+                />
+              ))}
+            </div>
+          </section>
+        </main>
+        <Footer />
+      </div>
+    </>
   )
 }
