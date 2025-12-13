@@ -63,7 +63,7 @@ export default async function Home() {
           <section>
             <Image
               src="/images/app-01.jpg"
-              alt="NodeJourney app screenshot"
+              alt="Nodejourney app screenshot"
               width={1400}
               height={900}
               className="rounded-xs"

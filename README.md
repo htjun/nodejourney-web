@@ -1,6 +1,6 @@
-# NodeJourney Website
+# Nodejourney Website
 
-Marketing website for [NodeJourney](https://github.com/htjun/nodejourney), a desktop visual editor for AI workflows.
+Marketing website for [Nodejourney](https://github.com/htjun/nodejourney), a desktop visual editor for AI workflows.
 
 ## Development
 

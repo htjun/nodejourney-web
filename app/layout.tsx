@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'NodeJourney',
-  description: 'NodeJourney',
+  title: 'Nodejourney',
+  description: 'Nodejourney',
 }
 
 export default function RootLayout({
