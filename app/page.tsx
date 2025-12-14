@@ -69,6 +69,46 @@ export default async function Home() {
               className="rounded-xs"
             />
           </section>
+          <section className="space-y-24 my-40">
+            <h2 className="text-2xl">Create with leading AI providers</h2>
+            <ul className="flex items-center gap-12 justify-center lg:justify-between flex-wrap ">
+              <li>
+                <img
+                  src="/images/openai.svg"
+                  alt="OpenAI"
+                  className="h-[40px] w-auto brightness-0"
+                />
+              </li>
+              <li>
+                <img
+                  src="/images/replicate.svg"
+                  alt="Replicate"
+                  className="h-[36px] w-auto brightness-0"
+                />
+              </li>
+              <li>
+                <img
+                  src="/images/anthropic.svg"
+                  alt="Anthropic"
+                  className="h-[26px] w-auto brightness-0"
+                />
+              </li>
+              <li>
+                <img
+                  src="/images/gemini.svg"
+                  alt="Google Gemini"
+                  className="h-[46px] w-auto brightness-0 mb-[18px]"
+                />
+              </li>
+              <li>
+                <img
+                  src="/images/fal.svg"
+                  alt="Fal"
+                  className="h-[32px] w-auto brightness-0 mb-[8px]"
+                />
+              </li>
+            </ul>
+          </section>
           <section className="space-y-8">
             <h2 className="text-2xl">What you're getting</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
