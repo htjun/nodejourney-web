@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import { CtaButton } from '@/components/cta-button'
 import { FeatureBox } from '@/components/feature-box'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
+import { ImageCarousel } from '@/components/image-carousel'
 import { StickyHeader } from '@/components/sticky-header'
 import { getLatestRelease } from '@/lib/releases'
 
@@ -61,13 +61,7 @@ export default async function Home() {
             </div>
           </section>
           <section>
-            <Image
-              src="/images/app-01.jpg"
-              alt="Nodejourney app screenshot"
-              width={1400}
-              height={900}
-              className="rounded-xs"
-            />
+            <ImageCarousel className="rounded-xs" />
           </section>
           <section className="space-y-24 my-40">
             <h2 className="text-2xl">Create with leading AI providers</h2>
