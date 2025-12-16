@@ -219,7 +219,7 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
   // Calculate reveal radius
   const easedProgress = easeOutCubic(progress)
   const maxRadius = Math.hypot(containerSize.width, containerSize.height)
-  const revealRadius = easedProgress * maxRadius * 1.2
+  const revealRadius = easedProgress * (maxRadius + FEATHER_WIDTH + 100)
   const innerRadius = Math.max(0, revealRadius - FEATHER_WIDTH)
 
   return (
