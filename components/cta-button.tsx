@@ -41,25 +41,13 @@ export function CtaButton({
     const y = ((e.clientY - rect.top) / rect.height) * 100
     ref.style.setProperty('--mouse-x', `${x}%`)
     ref.style.setProperty('--mouse-y', `${y}%`)
-
-    const rotateY = ((x - 50) / 50) * 12
-    const rotateX = ((50 - y) / 50) * 8
-    ref.style.setProperty('--rotate-x', `${rotateX}deg`)
-    ref.style.setProperty('--rotate-y', `${rotateY}deg`)
-  }
-
-  const handleMouseLeave = () => {
-    const ref = href ? anchorRef.current : buttonRef.current
-    if (!ref) return
-    ref.style.setProperty('--rotate-x', '0deg')
-    ref.style.setProperty('--rotate-y', '0deg')
   }
 
   const sharedClassName = cn(
     'group dreamy-button relative overflow-hidden rounded-full font-medium text-white cursor-pointer inline-block',
     sizeStyles[size],
     'transition-all duration-300 ease-out',
-    'hover:scale-[1.04] active:scale-[0.97] active:translate-y-[3px] hover:shadow-2xl/20',
+    'hover:scale-[1.03] active:scale-[0.97] active:translate-y-[3px] hover:shadow-2xl/20',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/50 focus-visible:ring-offset-2',
     className
   )
@@ -71,10 +59,6 @@ export function CtaButton({
   const sharedStyle = {
     ['--mouse-x' as string]: '50%',
     ['--mouse-y' as string]: '50%',
-    ['--rotate-x' as string]: '0deg',
-    ['--rotate-y' as string]: '0deg',
-    transform: 'perspective(800px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))',
-    transformStyle: 'preserve-3d' as const,
   }
 
   const innerContent = (
@@ -129,7 +113,6 @@ export function CtaButton({
         ref={anchorRef}
         href={href}
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         className={sharedClassName}
         style={sharedStyle}
       >
@@ -143,7 +126,6 @@ export function CtaButton({
       ref={buttonRef}
       onClick={onClick}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       className={sharedClassName}
       style={sharedStyle}
     >
