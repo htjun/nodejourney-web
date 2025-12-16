@@ -3,41 +3,10 @@ import { FeatureBox } from '@/components/feature-box'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import { ImageCarouselDom } from '@/components/image-carousel-dom'
+import { ProviderLogos } from '@/components/provider-logos'
 import { StickyHeader } from '@/components/sticky-header'
+import { FEATURES, PROVIDERS } from '@/lib/data/home'
 import { getLatestRelease } from '@/lib/releases'
-
-const FEATURES = [
-  {
-    title: 'Visual workflows',
-    description:
-      'Build AI pipelines on an infinite canvas. Connect text, JSON, and image nodes to prototype ideas without code.',
-  },
-  {
-    title: 'Privacy first',
-    description:
-      'Everything stays on your device. API keys are encrypted locally and never leave your machine.',
-  },
-  {
-    title: 'Multi-provider',
-    description:
-      'Connect OpenAI and Replicate from one interface. Generate text, images, and use vision capabilities across providers.',
-  },
-  {
-    title: 'Latest models',
-    description:
-      'Access the latest image and text models as they release. New models added via app updates.',
-  },
-  {
-    title: 'Portable projects',
-    description:
-      'Export workflows as single .njp files. Share with others or back up anywhere—no cloud sync needed.',
-  },
-  {
-    title: 'Auto-save',
-    description:
-      'Projects save automatically with full undo/redo history. Portable .njp files you can back up anywhere.',
-  },
-] as const
 
 export default async function Home() {
   const release = await getLatestRelease()
@@ -65,43 +34,7 @@ export default async function Home() {
           </section>
           <section className="space-y-24 md:my-48 my-24">
             <h2 className="text-2xl">Create with leading AI providers</h2>
-            <ul className="flex items-center gap-12 justify-center lg:justify-between flex-wrap">
-              <li>
-                <img
-                  src="/images/openai.svg"
-                  alt="OpenAI"
-                  className="h-[40px] w-auto brightness-0"
-                />
-              </li>
-              <li>
-                <img
-                  src="/images/replicate.svg"
-                  alt="Replicate"
-                  className="h-[36px] w-auto brightness-0"
-                />
-              </li>
-              <li>
-                <img
-                  src="/images/anthropic.svg"
-                  alt="Anthropic"
-                  className="h-[26px] w-auto brightness-0"
-                />
-              </li>
-              <li>
-                <img
-                  src="/images/gemini.svg"
-                  alt="Google Gemini"
-                  className="h-[46px] w-auto brightness-0 mb-[18px]"
-                />
-              </li>
-              <li>
-                <img
-                  src="/images/fal.svg"
-                  alt="Fal"
-                  className="h-[32px] w-auto brightness-0 mb-[8px]"
-                />
-              </li>
-            </ul>
+            <ProviderLogos providers={PROVIDERS} />
           </section>
           <section className="space-y-8">
             <h2 className="text-2xl">What you're getting</h2>
