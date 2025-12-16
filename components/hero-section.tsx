@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-
 import { CtaButton } from '@/components/cta-button'
 import { ImageCarouselDom } from '@/components/image-carousel-dom'
 import { IMAGE_THEMES } from '@/lib/data/home'
+import { useTheme } from '@/lib/theme-context'
 
 interface HeroSectionProps {
   downloadUrl?: string
@@ -12,7 +11,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ downloadUrl, version }: HeroSectionProps) {
-  const [imageIndex, setImageIndex] = useState(0)
+  const { imageIndex, setImageIndex } = useTheme()
 
   return (
     <>

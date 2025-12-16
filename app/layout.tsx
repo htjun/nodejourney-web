@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
+
+import { BodyBackground } from '@/components/body-background'
 import { geistMono, geistSans } from '@/lib/fonts'
+import { ThemeProvider } from '@/lib/theme-context'
 import { cn } from '@/lib/utils'
+
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -79,7 +83,9 @@ export default function RootLayout({
           geistMono.variable
         )}
       >
-        {children}
+        <ThemeProvider>
+          <BodyBackground>{children}</BodyBackground>
+        </ThemeProvider>
       </body>
     </html>
   )

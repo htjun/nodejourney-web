@@ -44,10 +44,10 @@ export const PROVIDERS = [
   { name: 'Fal', logo: '/images/fal.svg', height: 32, marginBottom: 8 },
 ] as const
 
-// Color themes for each carousel image [main, sub1, sub2]
+// Color themes for each carousel image [main, sub1, sub2] + bgColor
 export const IMAGE_THEMES = [
-  { colors: ['#FBCA5E', '#F19A43', '#538ECA'] as const }, // app-01.jpg
-  { colors: ['#0C0F12', '#56A473', '#4883D2'] as const }, // app-02.jpg
-  { colors: ['#8A629D', '#A76A3E', '#2B306A'] as const }, // app-03.jpg
-  { colors: ['#C770A9', '#C04F2B', '#CB687D'] as const }, // app-04.jpg
+  { colors: ['#FBCA5E', '#F19A43', '#538ECA'] as const, bgColor: '#F7F6F2' }, // app-01.jpg
+  { colors: ['#0C0F12', '#56A473', '#4883D2'] as const, bgColor: '#F6F9F8' }, // app-02.jpg
+  { colors: ['#8A629D', '#A76A3E', '#2B306A'] as const, bgColor: '#F8F5FA' }, // app-03.jpg
+  { colors: ['#C770A9', '#C04F2B', '#CB687D'] as const, bgColor: '#FAF4F9' }, // app-04.jpg
 ] as const
