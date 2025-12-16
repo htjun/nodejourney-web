@@ -63,9 +63,9 @@ export default async function Home() {
           <section>
             <ImageCarouselDom className="rounded-xs" />
           </section>
-          <section className="space-y-24 my-40">
+          <section className="space-y-24 md:my-48 my-24">
             <h2 className="text-2xl">Create with leading AI providers</h2>
-            <ul className="flex items-center gap-12 justify-center lg:justify-between flex-wrap ">
+            <ul className="flex items-center gap-12 justify-center lg:justify-between flex-wrap">
               <li>
                 <img
                   src="/images/openai.svg"
