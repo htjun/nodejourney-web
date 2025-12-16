@@ -26,9 +26,10 @@ function easeOutCubic(t: number): number {
 
 interface ImageCarouselDomProps {
   className?: string
+  onIndexChange?: (index: number) => void
 }
 
-export function ImageCarouselDom({ className }: ImageCarouselDomProps) {
+export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
@@ -62,6 +63,15 @@ export function ImageCarouselDom({ className }: ImageCarouselDomProps) {
       pendingTargetRef.current = currentIndex
     }
   }, [currentIndex, isTransitioning])
+
+  // Notify parent of index changes (when transition starts, not ends)
+  useEffect(() => {
+    if (isTransitioning && nextIndex !== null) {
+      onIndexChange?.(nextIndex)
+    } else if (!isTransitioning) {
+      onIndexChange?.(currentIndex)
+    }
+  }, [currentIndex, nextIndex, isTransitioning, onIndexChange])
 
   // Start transition animation
   const startTransition = useCallback(

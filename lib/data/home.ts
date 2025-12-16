@@ -35,6 +35,19 @@ export const PROVIDERS = [
   { name: 'OpenAI', logo: '/images/openai.svg', height: 40 },
   { name: 'Replicate', logo: '/images/replicate.svg', height: 36 },
   { name: 'Anthropic', logo: '/images/anthropic.svg', height: 26 },
-  { name: 'Google Gemini', logo: '/images/gemini.svg', height: 46, marginBottom: 18 },
+  {
+    name: 'Google Gemini',
+    logo: '/images/gemini.svg',
+    height: 46,
+    marginBottom: 18,
+  },
   { name: 'Fal', logo: '/images/fal.svg', height: 32, marginBottom: 8 },
+] as const
+
+// Color themes for each carousel image [main, sub1, sub2]
+export const IMAGE_THEMES = [
+  { colors: ['#FBCA5E', '#F19A43', '#538ECA'] as const }, // app-01.jpg
+  { colors: ['#0C0F12', '#56A473', '#4883D2'] as const }, // app-02.jpg
+  { colors: ['#8A629D', '#A76A3E', '#2B306A'] as const }, // app-03.jpg
+  { colors: ['#C770A9', '#C04F2B', '#CB687D'] as const }, // app-04.jpg
 ] as const

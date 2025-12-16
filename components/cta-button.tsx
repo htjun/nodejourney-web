@@ -12,6 +12,7 @@ interface CtaButtonProps {
   className?: string
   size?: ButtonSize
   href?: string
+  colors?: readonly [string, string, string]
 }
 
 const sizeStyles = {
@@ -27,6 +28,7 @@ export function CtaButton({
   className,
   size = 'default',
   href,
+  colors,
 }: CtaButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const anchorRef = useRef<HTMLAnchorElement>(null)
@@ -62,6 +64,10 @@ export function CtaButton({
     className
   )
 
+  const gradient = colors
+    ? `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]}, ${colors[1]}, ${colors[0]})`
+    : 'linear-gradient(135deg, #c4b5fd, #a5b4fc, #c7d2fe, #e9d5ff, #fae8ff, #c4b5fd)'
+
   const sharedStyle = {
     ['--mouse-x' as string]: '50%',
     ['--mouse-y' as string]: '50%',
@@ -88,10 +94,9 @@ export function CtaButton({
 
       {/* Gradient overlay */}
       <span
-        className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+        className="absolute inset-0 opacity-0 transition-all duration-700 group-hover:opacity-100"
         style={{
-          background:
-            'linear-gradient(135deg, #c4b5fd, #a5b4fc, #c7d2fe, #e9d5ff, #fae8ff, #c4b5fd)',
+          backgroundImage: gradient,
           backgroundSize: '400% 400%',
           animation: 'gradientFlow 12s ease infinite',
         }}
@@ -114,9 +119,7 @@ export function CtaButton({
       />
 
       {/* Text */}
-      <span className="relative z-10 transition-colors duration-500 text-white group-hover:text-[#19196a]/90">
-        {children}
-      </span>
+      <span className="relative z-10 transition-colors duration-500 text-white">{children}</span>
     </>
   )
 
