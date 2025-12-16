@@ -42,6 +42,7 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
   const [clickOrigin, setClickOrigin] = useState<Point | null>(null)
   const [progress, setProgress] = useState(0)
   const [cursorSide, setCursorSide] = useState<'left' | 'right' | null>(null)
+  const [resizeCount, setResizeCount] = useState(0)
 
   // Preload images
   useEffect(() => {
@@ -75,6 +76,8 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
       canvas.height = rect.height * dpr
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
+      // Trigger re-render after resize
+      setResizeCount((c) => c + 1)
     }
 
     handleResize()
@@ -105,6 +108,16 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
       return
     }
 
+    // Helper to draw image scaled to fill canvas
+    const drawImageFill = (
+      targetCtx: CanvasRenderingContext2D,
+      img: HTMLImageElement,
+      destWidth: number,
+      destHeight: number
+    ) => {
+      targetCtx.drawImage(img, 0, 0, destWidth, destHeight)
+    }
+
     if (isTransitioning && nextIndex !== null && clickOrigin) {
       const nextImg = imagesRef.current.get(IMAGE_PATHS[nextIndex])
       if (!nextImg) {
@@ -121,7 +134,7 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
       if (snapshotRef.current) {
         ctx.drawImage(snapshotRef.current, 0, 0, width, height)
       } else {
-        ctx.drawImage(currentImg, 0, 0, width, height)
+        drawImageFill(ctx, currentImg, width, height)
       }
 
       // Only draw the reveal effect once we have a positive radius
@@ -135,8 +148,8 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
           // Scale for DPR
           offCtx.scale(dpr, dpr)
 
-          // Draw next image to offscreen canvas
-          offCtx.drawImage(nextImg, 0, 0, width, height)
+          // Draw next image to offscreen canvas with cover fit
+          drawImageFill(offCtx, nextImg, width, height)
 
           // Apply radial gradient as mask using destination-in
           offCtx.globalCompositeOperation = 'destination-in'
@@ -177,12 +190,12 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
         ctx.fillRect(0, 0, width, height)
       }
     } else {
-      // Static: draw current image
-      ctx.drawImage(currentImg, 0, 0, width, height)
+      // Static: draw current image with cover fit
+      drawImageFill(ctx, currentImg, width, height)
     }
 
     ctx.restore()
-  }, [imagesLoaded, currentIndex, nextIndex, isTransitioning, clickOrigin, progress])
+  }, [imagesLoaded, currentIndex, nextIndex, isTransitioning, clickOrigin, progress, resizeCount])
 
   // Render on state changes
   useEffect(() => {
@@ -315,7 +328,7 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
     <div
       ref={containerRef}
       className={cn(
-        'relative aspect-[1400/900]',
+        'relative w-full aspect-1400/900',
         cursorSide === 'left' && 'cursor-w-resize',
         cursorSide === 'right' && 'cursor-e-resize',
         !cursorSide && 'cursor-default',
