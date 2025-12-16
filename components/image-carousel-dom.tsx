@@ -14,6 +14,7 @@ const IMAGE_PATHS = [
 const TRANSITION_DURATION = 1600
 const HOVER_ZONE_WIDTH = 0.5
 const FEATHER_WIDTH = 500
+const AUTO_CHANGE_INTERVAL = 3000
 
 interface Point {
   x: number
@@ -34,6 +35,8 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
   const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
   const pendingTargetRef = useRef<number>(0)
+  const autoChangeIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const hasUserInteractedRef = useRef(false)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [nextIndex, setNextIndex] = useState<number | null>(null)
@@ -135,6 +138,13 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
+      // Stop auto-change on user interaction
+      hasUserInteractedRef.current = true
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+        autoChangeIntervalRef.current = null
+      }
+
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
 
@@ -167,8 +177,44 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+      }
     }
   }, [])
+
+  // Auto-change effect
+  useEffect(() => {
+    if (hasUserInteractedRef.current) return
+
+    autoChangeIntervalRef.current = setInterval(() => {
+      if (hasUserInteractedRef.current) {
+        if (autoChangeIntervalRef.current) {
+          clearInterval(autoChangeIntervalRef.current)
+          autoChangeIntervalRef.current = null
+        }
+        return
+      }
+
+      // Skip if currently transitioning
+      if (isTransitioning) return
+
+      // Calculate next index
+      const nextIdx = (currentIndex + 1) % IMAGE_PATHS.length
+      pendingTargetRef.current = nextIdx
+
+      // Use bottom-right corner as origin
+      const origin = { x: containerSize.width, y: containerSize.height }
+      startTransition(nextIdx, origin)
+    }, AUTO_CHANGE_INTERVAL)
+
+    return () => {
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+        autoChangeIntervalRef.current = null
+      }
+    }
+  }, [currentIndex, isTransitioning, containerSize, startTransition])
 
   // Calculate reveal radius
   const easedProgress = easeOutCubic(progress)
