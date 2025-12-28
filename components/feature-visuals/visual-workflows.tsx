@@ -1,5 +1,15 @@
 'use client'
 
+import { Image } from 'lucide-react'
+
+function Node({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-white/40 backdrop-blur-sm border border-gray-400/80 rounded-xl shadow-md/5 w-20 h-20 flex items-center justify-center text-gray-700 font-medium text-sm">
+      {children}
+    </div>
+  )
+}
+
 export function VisualWorkflows() {
   return (
     <div
@@ -13,9 +23,7 @@ export function VisualWorkflows() {
       {/* Top row: Text -- line -- JSON */}
       <div className="flex items-center">
         {/* Text Node */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-md/5 w-20 h-14 flex items-center justify-center">
-          <span className="text-gray-600 font-medium text-sm">Text</span>
-        </div>
+        <Node>Text</Node>
 
         {/* Line between Text and JSON */}
         <svg width="80" height="2" className="overflow-visible -mx-px">
@@ -32,9 +40,7 @@ export function VisualWorkflows() {
         </svg>
 
         {/* JSON Node */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-md/5 w-20 h-14 flex items-center justify-center">
-          <span className="text-gray-600 font-medium text-sm">JSON</span>
-        </div>
+        <Node>JSON</Node>
       </div>
 
       {/* Curved line from JSON bottom-center to Image top-center */}
@@ -50,27 +56,9 @@ export function VisualWorkflows() {
       </svg>
 
       {/* Image Node */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-md/5 w-20 h-14 flex items-center justify-center">
-        <svg width="20" height="16" viewBox="0 0 16 14" fill="none" className="text-gray-600">
-          <rect
-            x="0.5"
-            y="0.5"
-            width="15"
-            height="13"
-            rx="1.5"
-            stroke="currentColor"
-            strokeWidth="1"
-          />
-          <circle cx="5" cy="4" r="1.5" fill="currentColor" />
-          <path
-            d="M1 11l3.5-4 2.5 3 3-4 5 5"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+      <Node>
+        <Image size={24} strokeWidth={1.5} />
+      </Node>
 
       <style jsx>{`
         @keyframes dashFlow {

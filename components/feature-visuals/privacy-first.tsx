@@ -7,14 +7,7 @@ const INNER_RADIUS = 60
 
 export function PrivacyFirst() {
   return (
-    <div
-      className="aspect-square rounded-xs flex items-center justify-center"
-      style={{
-        backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1px)',
-        backgroundPosition: '4px 4px',
-        backgroundSize: '24px 24px',
-      }}
-    >
+    <div className="aspect-square rounded-xs flex items-center justify-center">
       <div className="relative">
         {/* Animated circular paths - wave effect with fading opacity */}
         <svg width="180" height="180" viewBox="0 0 180 180" className="overflow-visible">
