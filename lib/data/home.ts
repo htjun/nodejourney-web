@@ -1,35 +1,43 @@
 export const FEATURES = [
   {
+    id: 'visual-workflows',
     title: 'Visual workflows',
     description:
       'Build AI pipelines on an infinite canvas. Connect text, JSON, and image nodes to prototype ideas without code.',
   },
   {
+    id: 'privacy-first',
     title: 'Privacy first',
     description:
       'Everything stays on your device. API keys are encrypted locally and never leave your machine.',
   },
   {
+    id: 'multi-provider',
     title: 'Multi-provider',
     description:
       'Connect OpenAI and Replicate from one interface. Generate text, images, and use vision capabilities across providers.',
   },
   {
+    id: 'latest-models',
     title: 'Latest models',
     description:
       'Access the latest image and text models as they release. New models added via app updates.',
   },
   {
+    id: 'portable-projects',
     title: 'Portable projects',
     description:
       'Export workflows as single .njp files. Share with others or back up anywhere—no cloud sync needed.',
   },
   {
+    id: 'auto-save',
     title: 'Auto-save',
     description:
       'Projects save automatically with full undo/redo history. Portable .njp files you can back up anywhere.',
   },
 ] as const
+
+export type FeatureId = (typeof FEATURES)[number]['id']
 
 export const PROVIDERS = [
   { name: 'OpenAI', logo: '/images/openai.svg', height: 40 },
