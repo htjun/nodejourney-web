@@ -24,7 +24,7 @@ export function VisualWorkflows() {
             y1="1"
             x2="80"
             y2="1"
-            stroke="#9ca3af"
+            stroke="rgba(156, 163, 175, 0.6)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
             style={{ animation: 'dashFlow 2s linear infinite' }}
@@ -42,7 +42,7 @@ export function VisualWorkflows() {
         <path
           d="M 80 0 C 80 24, 0 24, 0 48"
           fill="none"
-          stroke="#9ca3af"
+          stroke="rgba(156, 163, 175, 0.6)"
           strokeWidth="1.5"
           strokeDasharray="4 3"
           style={{ animation: 'dashFlowCurve 2s linear infinite' }}
