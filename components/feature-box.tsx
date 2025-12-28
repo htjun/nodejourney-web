@@ -14,7 +14,9 @@ export function FeatureBox({ id, title, description }: FeatureBoxProps) {
         <h3 className="font-medium">{title}</h3>
         <p className="text-gray-500">{description}</p>
       </div>
-      <FeatureVisual id={id} />
+      <div className="bg-white/30">
+        <FeatureVisual id={id} />
+      </div>
     </div>
   )
 }
