@@ -4,7 +4,7 @@ import { Image } from 'lucide-react'
 
 function Node({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white/40 backdrop-blur-sm border border-gray-400/80 rounded-xl shadow-md/5 w-20 h-20 flex items-center justify-center text-gray-700 font-medium text-sm">
+    <div className="bg-white/40 backdrop-blur-sm border border-gray-400/50 rounded-xl shadow-md/5 w-20 h-20 flex items-center justify-center text-gray-700 font-medium text-sm">
       {children}
     </div>
   )
