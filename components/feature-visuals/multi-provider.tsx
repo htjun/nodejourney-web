@@ -58,7 +58,7 @@ export function MultiProvider() {
             return (
               <div
                 key={`provider-${i}`}
-                className="absolute bg-white/30 backdrop-blur-lg border border-gray-400/30 rounded-full flex items-center justify-center counter-rotate"
+                className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/30 rounded-full flex items-center justify-center counter-rotate"
                 style={{
                   width: PROVIDER_CIRCLE_SIZE,
                   height: PROVIDER_CIRCLE_SIZE,
