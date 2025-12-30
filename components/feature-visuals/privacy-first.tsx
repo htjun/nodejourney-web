@@ -20,7 +20,7 @@ export function PrivacyFirst() {
             stroke="rgba(156, 163, 175, 0.5)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            className="circuit-path"
+            className="pf-circuit-path"
           />
           {/* Second circle */}
           <circle
@@ -31,7 +31,7 @@ export function PrivacyFirst() {
             stroke="rgba(156, 163, 175, 0.4)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            className="circuit-path"
+            className="pf-circuit-path"
           />
           {/* Third circle */}
           <circle
@@ -42,7 +42,7 @@ export function PrivacyFirst() {
             stroke="rgba(156, 163, 175, 0.3)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            className="circuit-path"
+            className="pf-circuit-path"
           />
           {/* Fourth circle */}
           <circle
@@ -53,7 +53,7 @@ export function PrivacyFirst() {
             stroke="rgba(156, 163, 175, 0.2)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            className="circuit-path"
+            className="pf-circuit-path"
           />
           {/* Outermost circle - faintest */}
           <circle
@@ -64,7 +64,7 @@ export function PrivacyFirst() {
             stroke="rgba(156, 163, 175, 0.1)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            className="circuit-path"
+            className="pf-circuit-path"
           />
         </svg>
 
@@ -77,10 +77,10 @@ export function PrivacyFirst() {
       </div>
 
       <style jsx>{`
-        .circuit-path {
-          animation: circuitFlow 3s linear infinite;
+        .pf-circuit-path {
+          animation: pfCircuitFlow 3s linear infinite;
         }
-        @keyframes circuitFlow {
+        @keyframes pfCircuitFlow {
           to {
             stroke-dashoffset: -14;
           }

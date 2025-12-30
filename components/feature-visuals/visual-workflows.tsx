@@ -35,7 +35,7 @@ export function VisualWorkflows() {
             stroke="rgba(156, 163, 175, 0.6)"
             strokeWidth="1.5"
             strokeDasharray="4 3"
-            style={{ animation: 'dashFlow 2s linear infinite' }}
+            className="vw-dash-flow"
           />
         </svg>
 
@@ -51,7 +51,7 @@ export function VisualWorkflows() {
           stroke="rgba(156, 163, 175, 0.6)"
           strokeWidth="1.5"
           strokeDasharray="4 3"
-          style={{ animation: 'dashFlowCurve 2s linear infinite' }}
+          className="vw-dash-flow-curve"
         />
       </svg>
 
@@ -61,12 +61,18 @@ export function VisualWorkflows() {
       </Node>
 
       <style jsx>{`
-        @keyframes dashFlow {
+        .vw-dash-flow {
+          animation: vwDashFlow 2s linear infinite;
+        }
+        .vw-dash-flow-curve {
+          animation: vwDashFlowCurve 2s linear infinite;
+        }
+        @keyframes vwDashFlow {
           to {
             stroke-dashoffset: -14;
           }
         }
-        @keyframes dashFlowCurve {
+        @keyframes vwDashFlowCurve {
           to {
             stroke-dashoffset: -14;
           }

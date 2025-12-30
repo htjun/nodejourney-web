@@ -25,7 +25,7 @@ export function MultiProvider() {
     <div className="aspect-square rounded-xs flex items-center justify-center overflow-hidden">
       <div className="relative" style={{ width: SVG_SIZE, height: SVG_SIZE }}>
         {/* Rotating wrapper for lines and provider circles */}
-        <div className="absolute inset-0 rotating-ring">
+        <div className="absolute inset-0 mp-rotating-ring">
           {/* SVG for dashed lines */}
           <svg width={SVG_SIZE} height={SVG_SIZE} className="absolute inset-0">
             {PROVIDERS.map((_, i) => {
@@ -43,7 +43,7 @@ export function MultiProvider() {
                   stroke="rgba(156, 163, 175, 0.5)"
                   strokeWidth="1.5"
                   strokeDasharray="4 3"
-                  className="dash-flow"
+                  className="mp-dash-flow"
                 />
               )
             })}
@@ -58,7 +58,7 @@ export function MultiProvider() {
             return (
               <div
                 key={`provider-${i}`}
-                className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/30 rounded-full flex items-center justify-center counter-rotate"
+                className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/30 rounded-full flex items-center justify-center mp-counter-rotate"
                 style={{
                   width: PROVIDER_CIRCLE_SIZE,
                   height: PROVIDER_CIRCLE_SIZE,
@@ -93,26 +93,26 @@ export function MultiProvider() {
       </div>
 
       <style jsx>{`
-        .rotating-ring {
-          animation: rotate 120s linear infinite;
+        .mp-rotating-ring {
+          animation: mpRotate 120s linear infinite;
         }
-        .counter-rotate {
-          animation: counter-rotate 120s linear infinite;
+        .mp-counter-rotate {
+          animation: mpCounterRotate 120s linear infinite;
         }
-        .dash-flow {
-          animation: dashFlow 2s linear infinite;
+        .mp-dash-flow {
+          animation: mpDashFlow 2s linear infinite;
         }
-        @keyframes rotate {
+        @keyframes mpRotate {
           to {
             transform: rotate(360deg);
           }
         }
-        @keyframes counter-rotate {
+        @keyframes mpCounterRotate {
           to {
             transform: rotate(-360deg);
           }
         }
-        @keyframes dashFlow {
+        @keyframes mpDashFlow {
           to {
             stroke-dashoffset: 14;
           }
