@@ -1,47 +1,54 @@
 'use client'
 
-import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+function NjpIcon({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      fill="currentColor"
+      viewBox="0 0 28 26"
+      className={className}
+    >
+      <path d="M19.361 0a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 .293.707v16a2 2 0 0 1-2 2h-3a1 1 0 0 1 0-2h3V9h-6a1 1 0 0 1-1-1V2h-11v9a1 1 0 0 1-2 0V2a2 2 0 0 1 2-2zm-6.049 15c.68 0 1.073.417 1.073 1.153v4.796c0 1.957-1.16 3.051-3.1 3.051-1.37 0-2.396-.61-2.847-1.655a2.2 2.2 0 0 1-.165-.822c0-.622.399-1.026.997-1.026.533 0 .837.253 1.007.839.141.507.487.785.985.785.633 0 .978-.41.978-1.19v-4.778c0-.736.393-1.153 1.072-1.153M6.37 15c.645 0 1.02.393 1.02 1.1v6.843c0 .67-.364 1.038-1.014 1.038-.434 0-.72-.174-1.031-.615l-3.258-4.634h-.047v4.15c0 .707-.38 1.1-1.02 1.1-.644 0-1.019-.393-1.019-1.1v-6.831C0 15.368.375 15 1.043 15c.41 0 .703.181 1.025.616L5.303 20.2h.047v-4.1c0-.707.38-1.1 1.02-1.1m13.055.133c1.816 0 3.047 1.214 3.047 3.087 0 1.86-1.295 3.074-3.176 3.074h-1.383v1.534c0 .737-.392 1.153-1.072 1.153s-1.078-.416-1.078-1.153v-6.535c0-.737.398-1.16 1.078-1.16zm-1.512 4.494h.932c.914 0 1.453-.49 1.453-1.401 0-.906-.54-1.396-1.442-1.396h-.943zM20.362 7h3.585l-3.586-3.586z" />
+    </svg>
+  )
+}
 
 // Grid settings
-const GRID_SIZE = 5
+const GRID_COLS = 5
 const ICON_SIZE = 24
-const GRID_GAP = 12 // Tailwind gap-12 = 3rem
+const GAP = 48 // gap in pixels
 
-// Mask settings
-const MASK_RADIUS = 120
-const BASE_OPACITY = 0.15
-const HIGHLIGHT_OPACITY = 0.7
+// Layout
+const ROW_HEIGHT = ICON_SIZE + GAP
+const VISIBLE_ROWS = 6
+const BUFFER_ROWS = 1
 
-// Animation settings
-const ANIMATION_SPEED = 0.01
-const WANDER_RANGE_X = 20
-const WANDER_RANGE_Y = 20
-const SECONDARY_RANGE_X = 10
-const SECONDARY_RANGE_Y = 10
-const FREQUENCY_X1 = 1
-const FREQUENCY_X2 = 0.7
-const FREQUENCY_Y1 = 0.8
-const FREQUENCY_Y2 = 1.3
+// Animation
+const PAN_SPEED = 0.15 // pixels per frame
+
+// Fade effect (percentage of container height)
+const FADE_START = 5 // top edge starts transparent
+const FADE_VISIBLE_START = 40 // becomes fully visible
+const FADE_VISIBLE_END = 60 // stays fully visible until
+const FADE_END = 95 // bottom edge becomes transparent
 
 export function PortableProjects() {
-  const [position, setPosition] = useState({ x: 50, y: 50 })
+  const [offset, setOffset] = useState(0)
+  const offsetRef = useRef(0)
+  const containerHeight = ROW_HEIGHT * VISIBLE_ROWS
+  const gridWidth = GRID_COLS * ICON_SIZE + (GRID_COLS - 1) * GAP
 
+  // Continuous smooth scrolling
   useEffect(() => {
     let animationId: number
-    let time = 0
 
     const animate = () => {
-      time += ANIMATION_SPEED
-      const x =
-        50 +
-        Math.sin(time * FREQUENCY_X1) * WANDER_RANGE_X +
-        Math.sin(time * FREQUENCY_X2) * SECONDARY_RANGE_X
-      const y =
-        50 +
-        Math.cos(time * FREQUENCY_Y1) * WANDER_RANGE_Y +
-        Math.cos(time * FREQUENCY_Y2) * SECONDARY_RANGE_Y
-      setPosition({ x, y })
+      offsetRef.current = (offsetRef.current + PAN_SPEED) % ROW_HEIGHT
+      setOffset(offsetRef.current)
       animationId = requestAnimationFrame(animate)
     }
 
@@ -49,39 +56,42 @@ export function PortableProjects() {
     return () => cancelAnimationFrame(animationId)
   }, [])
 
-  const grid = (
-    <div
-      className="grid"
-      style={{
-        gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
-        gap: `${GRID_GAP * 0.25}rem`,
-      }}
-    >
-      {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => (
-        <Image key={i} src="/images/njp-icon.svg" alt="" width={ICON_SIZE} height={ICON_SIZE} />
-      ))}
-    </div>
-  )
-
-  const maskGradient = `radial-gradient(circle ${MASK_RADIUS}px at ${position.x}% ${position.y}%, black 0%, transparent 100%)`
+  // Render rows - we render enough to cover visible area + buffer
+  const totalRows = VISIBLE_ROWS + BUFFER_ROWS * 2
+  const rows = Array.from({ length: totalRows }, (_, i) => i)
 
   return (
-    <div className="aspect-square rounded-xs flex items-center justify-center overflow-hidden">
-      <div className="relative">
-        {/* Base layer - faded */}
-        <div style={{ opacity: BASE_OPACITY }}>{grid}</div>
+    <div className="aspect-square rounded-xs overflow-hidden relative flex items-center justify-center">
+      <div
+        className="relative overflow-hidden"
+        style={{
+          height: containerHeight,
+          width: gridWidth,
+          maskImage: `linear-gradient(to bottom, transparent ${FADE_START}%, black ${FADE_VISIBLE_START}%, black ${FADE_VISIBLE_END}%, transparent ${FADE_END}%)`,
+          WebkitMaskImage: `linear-gradient(to bottom, transparent ${FADE_START}%, black ${FADE_VISIBLE_START}%, black ${FADE_VISIBLE_END}%, transparent ${FADE_END}%)`,
+        }}
+      >
+        {rows.map((rowIndex) => {
+          // Position each row, offset by scroll amount
+          const baseTop = (rowIndex - BUFFER_ROWS) * ROW_HEIGHT
+          const top = baseTop - offset
 
-        {/* Top layer - with circular mask that moves */}
-        <div
-          className="absolute inset-0"
-          style={{
-            opacity: HIGHLIGHT_OPACITY,
-            maskImage: maskGradient,
-            WebkitMaskImage: maskGradient,
-          }}
-        >
-          {grid}
-        </div>
+          return (
+            <div key={rowIndex} className="absolute" style={{ top }}>
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: `repeat(${GRID_COLS}, ${ICON_SIZE}px)`,
+                  gap: `${GAP}px`,
+                }}
+              >
+                {Array.from({ length: GRID_COLS }).map((_, i) => (
+                  <NjpIcon key={i} size={ICON_SIZE} className="text-gray-500/80" />
+                ))}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
