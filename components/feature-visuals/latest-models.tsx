@@ -73,7 +73,7 @@ export function LatestModels() {
 
   return (
     <div className="aspect-square rounded-xs flex items-center justify-center">
-      <div className="relative overflow-y-clip" style={{ height: containerHeight }}>
+      <div className="relative overflow-hidden w-full" style={{ height: containerHeight }}>
         {visibleItems.map(({ model, virtualIndex, positionFromCenter }) => {
           // Each item is positioned absolutely based on its position from center
           const top = (positionFromCenter + centerIndex) * ITEM_HEIGHT
