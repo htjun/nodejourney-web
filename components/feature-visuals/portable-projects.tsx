@@ -1,7 +1,3 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
-
 function NjpIcon({ size, className }: { size: number; className?: string }) {
   return (
     <svg
@@ -21,14 +17,18 @@ function NjpIcon({ size, className }: { size: number; className?: string }) {
 const GRID_COLS = 5
 const ICON_SIZE = 24
 const GAP = 48 // gap in pixels
+const COL_WIDTH = ICON_SIZE + GAP
 
 // Layout
 const ROW_HEIGHT = ICON_SIZE + GAP
 const VISIBLE_ROWS = 6
 const BUFFER_ROWS = 1
 
-// Animation
-const PAN_SPEED = 0.15 // pixels per frame
+// Animation duration in seconds (time to scroll one row height)
+const ANIMATION_DURATION = 16
+
+// Direction per column: 1 = down, -1 = up (matching the screenshot pattern)
+const COLUMN_DIRECTIONS = [1, -1, 1, -1, 1]
 
 // Fade effect (percentage of container height)
 const FADE_START = 5 // top edge starts transparent
@@ -37,31 +37,27 @@ const FADE_VISIBLE_END = 60 // stays fully visible until
 const FADE_END = 95 // bottom edge becomes transparent
 
 export function PortableProjects() {
-  const [offset, setOffset] = useState(0)
-  const offsetRef = useRef(0)
   const containerHeight = ROW_HEIGHT * VISIBLE_ROWS
   const gridWidth = GRID_COLS * ICON_SIZE + (GRID_COLS - 1) * GAP
 
-  // Continuous smooth scrolling
-  useEffect(() => {
-    let animationId: number
-
-    const animate = () => {
-      offsetRef.current = (offsetRef.current + PAN_SPEED) % ROW_HEIGHT
-      setOffset(offsetRef.current)
-      animationId = requestAnimationFrame(animate)
-    }
-
-    animationId = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationId)
-  }, [])
-
-  // Render rows - we render enough to cover visible area + buffer
+  // Render rows per column - each column scrolls independently
   const totalRows = VISIBLE_ROWS + BUFFER_ROWS * 2
   const rows = Array.from({ length: totalRows }, (_, i) => i)
 
   return (
     <div className="aspect-square rounded-xs overflow-hidden relative flex items-center justify-center">
+      <style>
+        {`
+          @keyframes scrollDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(-${ROW_HEIGHT}px); }
+          }
+          @keyframes scrollUp {
+            from { transform: translateY(0); }
+            to { transform: translateY(${ROW_HEIGHT}px); }
+          }
+        `}
+      </style>
       <div
         className="relative overflow-hidden"
         style={{
@@ -71,24 +67,32 @@ export function PortableProjects() {
           WebkitMaskImage: `linear-gradient(to bottom, transparent ${FADE_START}%, black ${FADE_VISIBLE_START}%, black ${FADE_VISIBLE_END}%, transparent ${FADE_END}%)`,
         }}
       >
-        {rows.map((rowIndex) => {
-          // Position each row, offset by scroll amount
-          const baseTop = (rowIndex - BUFFER_ROWS) * ROW_HEIGHT
-          const top = baseTop - offset
+        {/* Render each column independently */}
+        {Array.from({ length: GRID_COLS }).map((_, colIndex) => {
+          const direction = COLUMN_DIRECTIONS[colIndex]
+          const animationName = direction === 1 ? 'scrollDown' : 'scrollUp'
 
           return (
-            <div key={rowIndex} className="absolute" style={{ top }}>
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: `repeat(${GRID_COLS}, ${ICON_SIZE}px)`,
-                  gap: `${GAP}px`,
-                }}
-              >
-                {Array.from({ length: GRID_COLS }).map((_, i) => (
-                  <NjpIcon key={i} size={ICON_SIZE} className="text-gray-500/80" />
-                ))}
-              </div>
+            <div
+              key={colIndex}
+              className="absolute"
+              style={{
+                left: colIndex * COL_WIDTH,
+                width: ICON_SIZE,
+                height: '100%',
+                animation: `${animationName} ${ANIMATION_DURATION}s linear infinite`,
+                willChange: 'transform',
+              }}
+            >
+              {rows.map((rowIndex) => {
+                const baseTop = (rowIndex - BUFFER_ROWS) * ROW_HEIGHT
+
+                return (
+                  <div key={rowIndex} className="absolute" style={{ top: baseTop }}>
+                    <NjpIcon size={ICON_SIZE} className="text-gray-500/80" />
+                  </div>
+                )
+              })}
             </div>
           )
         })}
