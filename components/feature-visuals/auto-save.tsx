@@ -122,6 +122,14 @@ export function AutoSave() {
           clip-path: inset(0 100% 0 0);
         }
 
+        /* GPU compositing to prevent Chrome flicker on animation loop restart */
+        .as-checkpoint-4, .as-checkpoint-5, .as-checkpoint-6,
+        .as-dot-6, .as-circle-6, .as-line-6 {
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+          will-change: transform, opacity;
+        }
+
         /* Part 1: Checkpoints 1-3 (disappear after Part 1 ends) */
         .as-dot-1    { animation: asDot ${CYCLE}s forwards, asHide 0s ${CYCLE * 3}s forwards; }
         .as-circle-1 { animation: asCircle ${CYCLE}s ease-in-out forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
