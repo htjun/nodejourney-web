@@ -14,7 +14,7 @@ const PROVIDERS = [
 
 const ORBIT_RADIUS = 130
 const PROVIDER_CIRCLE_SIZE = 60
-const CENTER_CIRCLE_SIZE = 80
+const CENTER_CIRCLE_SIZE = 50
 const LOGO_SIZE = 20
 const SVG_SIZE = 260
 
@@ -58,7 +58,7 @@ export function MultiProvider() {
             return (
               <div
                 key={`provider-${i}`}
-                className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/30 rounded-full flex items-center justify-center mp-counter-rotate"
+                className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/50 rounded-full flex items-center justify-center mp-counter-rotate shadow-md/5"
                 style={{
                   width: PROVIDER_CIRCLE_SIZE,
                   height: PROVIDER_CIRCLE_SIZE,
@@ -80,7 +80,7 @@ export function MultiProvider() {
 
         {/* Center circle (static, does not rotate) */}
         <div
-          className="absolute bg-white/40 backdrop-blur-lg border border-gray-400/50 rounded-full shadow-xl/5 flex items-center justify-center"
+          className="absolute rounded-full flex items-center justify-center backdrop-blur-lg"
           style={{
             width: CENTER_CIRCLE_SIZE,
             height: CENTER_CIRCLE_SIZE,
