@@ -1,6 +1,6 @@
 'use client'
 
-import { Image } from 'lucide-react'
+import { ImageIcon } from '@phosphor-icons/react'
 
 function Node({ children }: { children: React.ReactNode }) {
   return (
@@ -57,7 +57,7 @@ export function VisualWorkflows() {
 
       {/* Image Node */}
       <Node>
-        <Image size={24} strokeWidth={1.5} />
+        <ImageIcon size={24} weight="light" />
       </Node>
 
       <style jsx>{`

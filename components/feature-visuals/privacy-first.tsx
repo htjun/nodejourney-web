@@ -1,6 +1,6 @@
 'use client'
 
-import { ShieldCheck } from 'lucide-react'
+import { KeyIcon } from '@phosphor-icons/react'
 
 const CIRCLE_GAP = 28
 const INNER_RADIUS = 60
@@ -69,9 +69,9 @@ export function PrivacyFirst() {
         </svg>
 
         {/* Shield icon in center */}
-        <ShieldCheck
-          size={48}
-          strokeWidth={1.5}
+        <KeyIcon
+          size={32}
+          weight="light"
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-500"
         />
       </div>
