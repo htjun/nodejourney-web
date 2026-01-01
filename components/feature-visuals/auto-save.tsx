@@ -33,10 +33,17 @@ export function AutoSave() {
             const cx = CENTER_X + CHECKPOINT_SPACING * position
             return (
               <g key={index} className={`as-checkpoint-${index}`}>
+                <circle
+                  cx={cx}
+                  cy="30"
+                  r={CIRCLE_RADIUS}
+                  fill="rgba(255, 255, 255, 0.4)"
+                  className={`as-bg-${index}`}
+                />
                 <polyline
                   points={`${cx - 5} 30 ${cx - 1.5} 33.5 ${cx + 5.5} 26`}
                   fill="none"
-                  stroke="rgba(156, 163, 175, 0.6)"
+                  stroke="rgb(55, 65, 81)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -47,7 +54,7 @@ export function AutoSave() {
                   cy="30"
                   r={CIRCLE_RADIUS}
                   fill="none"
-                  stroke="rgba(156, 163, 175, 0.5)"
+                  stroke="rgba(156, 163, 175, 0.6)"
                   strokeWidth="1.5"
                   transform={`rotate(-90 ${cx} 30)`}
                   className={`as-circle-${index}`}
@@ -58,7 +65,7 @@ export function AutoSave() {
                     y1="30"
                     x2={cx + CHECKPOINT_SPACING - CIRCLE_RADIUS}
                     y2="30"
-                    stroke="rgba(156, 163, 175, 0.4)"
+                    stroke="rgba(156, 163, 175, 0.6)"
                     strokeWidth="1.5"
                     strokeDasharray="4 3"
                   />
@@ -113,6 +120,9 @@ export function AutoSave() {
         }
 
         /* Base styles */
+        .as-bg-1, .as-bg-2, .as-bg-3, .as-bg-4, .as-bg-5, .as-bg-6 {
+          opacity: 0;
+        }
         .as-check-1, .as-check-2, .as-check-3, .as-check-4, .as-check-5, .as-check-6 {
           stroke-dasharray: ${CHECK_PATH_LENGTH};
           stroke-dashoffset: ${CHECK_PATH_LENGTH};
@@ -125,27 +135,39 @@ export function AutoSave() {
           clip-path: inset(0 100% 0 0);
         }
 
+        /* Background fade keyframes */
+        @keyframes asBgFade {
+          0% { opacity: 0; }
+          25%, 100% { opacity: 1; }
+        }
+
         /* GPU compositing to prevent Chrome flicker on animation loop restart */
         .as-checkpoint-4, .as-checkpoint-5, .as-checkpoint-6,
-        .as-check-6, .as-circle-6, .as-line-6 {
+        .as-bg-6, .as-check-6, .as-circle-6, .as-line-6 {
           -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
           will-change: transform, opacity;
         }
 
         /* Part 1: Checkpoints 1-3 (disappear after Part 1 ends) */
+        .as-bg-1     { animation: asBgFade ${CYCLE}s ease-in-out forwards, asHideBg 0s ${CYCLE * 3}s forwards; }
         .as-check-1  { animation: asCheck ${CYCLE}s ease-in-out forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-1 { animation: asCircle ${CYCLE}s ease-in-out forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-1   { animation: asLine ${CYCLE}s ease-in forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
+        .as-bg-2     { animation: asBgFade ${CYCLE}s ease-in-out ${CYCLE}s forwards, asHideBg 0s ${CYCLE * 3}s forwards; }
         .as-check-2  { animation: asCheck ${CYCLE}s ease-in-out ${CYCLE}s forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-2 { animation: asCircle ${CYCLE}s ease-in-out ${CYCLE}s forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-2   { animation: asLine ${CYCLE}s ease-in ${CYCLE}s forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
+        .as-bg-3     { animation: asBgFade ${CYCLE}s ease-in-out ${CYCLE * 2}s forwards, asHideBg 0s ${CYCLE * 3}s forwards; }
         .as-check-3  { animation: asCheck ${CYCLE}s ease-in-out ${CYCLE * 2}s forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-3 { animation: asCircle ${CYCLE}s ease-in-out ${CYCLE * 2}s forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-3   { animation: asLine ${CYCLE}s ease-in ${CYCLE * 2}s forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
+        @keyframes asHideBg {
+          to { opacity: 0; }
+        }
         @keyframes asHideCheck {
           to { stroke-dashoffset: ${CHECK_PATH_LENGTH}; }
         }
@@ -175,18 +197,24 @@ export function AutoSave() {
         }
 
         /* Checkpoints 4-5: static (already built), just appear after Part 1 */
+        .as-bg-4     { animation: asShowBg 0s ${PART2_START}s forwards; }
         .as-check-4  { animation: asShowCheck 0s ${PART2_START}s forwards; }
         .as-circle-4 { animation: asShowCircle 0s ${PART2_START}s forwards; }
         .as-line-4   { animation: asShowLine 0s ${PART2_START}s forwards; }
+        .as-bg-5     { animation: asShowBg 0s ${PART2_START}s forwards; }
         .as-check-5  { animation: asShowCheck 0s ${PART2_START}s forwards; }
         .as-circle-5 { animation: asShowCircle 0s ${PART2_START}s forwards; }
         .as-line-5   { animation: asShowLine 0s ${PART2_START}s forwards; }
 
         /* Checkpoint 6: animates in each loop cycle (same timing as Part 1) */
+        .as-bg-6     { animation: asBgLoop ${CYCLE}s ease-in-out ${PART2_START}s infinite; }
         .as-check-6  { animation: asCheckLoop ${CYCLE}s ease-in-out ${PART2_START}s infinite; }
         .as-circle-6 { animation: asCircleLoop ${CYCLE}s ease-in-out ${PART2_START}s infinite; }
         .as-line-6   { animation: asLineLoop ${CYCLE}s ease-in ${PART2_START}s infinite; }
 
+        @keyframes asShowBg {
+          to { opacity: 1; }
+        }
         @keyframes asShowCheck {
           to { stroke-dashoffset: 0; }
         }
@@ -198,6 +226,10 @@ export function AutoSave() {
         }
 
         /* Looping keyframes for Part 2 - same timing as Part 1 but resets at end */
+        @keyframes asBgLoop {
+          0% { opacity: 0; }
+          25%, 100% { opacity: 1; }
+        }
         @keyframes asCheckLoop {
           0% { stroke-dashoffset: ${CHECK_PATH_LENGTH}; }
           25%, 100% { stroke-dashoffset: 0; }
