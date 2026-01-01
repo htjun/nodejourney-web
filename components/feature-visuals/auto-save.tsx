@@ -1,7 +1,7 @@
 'use client'
 
-const DOT_RADIUS = 5
 const CIRCLE_RADIUS = 16
+const CHECK_PATH_LENGTH = 16
 const CIRCUMFERENCE = 100.53 // 2 * PI * 16
 const LINE_LENGTH = 60
 const CHECKPOINT_SPACING = LINE_LENGTH + CIRCLE_RADIUS * 2 // 92
@@ -33,12 +33,14 @@ export function AutoSave() {
             const cx = CENTER_X + CHECKPOINT_SPACING * position
             return (
               <g key={index} className={`as-checkpoint-${index}`}>
-                <circle
-                  cx={cx}
-                  cy="30"
-                  r={DOT_RADIUS}
-                  fill="rgba(156, 163, 175, 0.6)"
-                  className={`as-dot-${index}`}
+                <polyline
+                  points={`${cx - 5} 30 ${cx - 1.5} 33.5 ${cx + 5.5} 26`}
+                  fill="none"
+                  stroke="rgba(156, 163, 175, 0.6)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`as-check-${index}`}
                 />
                 <circle
                   cx={cx}
@@ -97,9 +99,9 @@ export function AutoSave() {
         }
 
         /* Shared keyframes */
-        @keyframes asDot {
-          0% { opacity: 0; }
-          1%, 100% { opacity: 1; }
+        @keyframes asCheck {
+          0% { stroke-dashoffset: ${CHECK_PATH_LENGTH}; }
+          25%, 100% { stroke-dashoffset: 0; }
         }
         @keyframes asCircle {
           0% { stroke-dashoffset: ${CIRCUMFERENCE}; }
@@ -111,8 +113,9 @@ export function AutoSave() {
         }
 
         /* Base styles */
-        .as-dot-1, .as-dot-2, .as-dot-3, .as-dot-4, .as-dot-5, .as-dot-6 {
-          opacity: 0;
+        .as-check-1, .as-check-2, .as-check-3, .as-check-4, .as-check-5, .as-check-6 {
+          stroke-dasharray: ${CHECK_PATH_LENGTH};
+          stroke-dashoffset: ${CHECK_PATH_LENGTH};
         }
         .as-circle-1, .as-circle-2, .as-circle-3, .as-circle-4, .as-circle-5, .as-circle-6 {
           stroke-dasharray: ${CIRCUMFERENCE};
@@ -124,27 +127,27 @@ export function AutoSave() {
 
         /* GPU compositing to prevent Chrome flicker on animation loop restart */
         .as-checkpoint-4, .as-checkpoint-5, .as-checkpoint-6,
-        .as-dot-6, .as-circle-6, .as-line-6 {
+        .as-check-6, .as-circle-6, .as-line-6 {
           -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
           will-change: transform, opacity;
         }
 
         /* Part 1: Checkpoints 1-3 (disappear after Part 1 ends) */
-        .as-dot-1    { animation: asDot ${CYCLE}s forwards, asHide 0s ${CYCLE * 3}s forwards; }
+        .as-check-1  { animation: asCheck ${CYCLE}s ease-in-out forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-1 { animation: asCircle ${CYCLE}s ease-in-out forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-1   { animation: asLine ${CYCLE}s ease-in forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
-        .as-dot-2    { animation: asDot ${CYCLE}s ${CYCLE}s forwards, asHide 0s ${CYCLE * 3}s forwards; }
+        .as-check-2  { animation: asCheck ${CYCLE}s ease-in-out ${CYCLE}s forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-2 { animation: asCircle ${CYCLE}s ease-in-out ${CYCLE}s forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-2   { animation: asLine ${CYCLE}s ease-in ${CYCLE}s forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
-        .as-dot-3    { animation: asDot ${CYCLE}s ${CYCLE * 2}s forwards, asHide 0s ${CYCLE * 3}s forwards; }
+        .as-check-3  { animation: asCheck ${CYCLE}s ease-in-out ${CYCLE * 2}s forwards, asHideCheck 0s ${CYCLE * 3}s forwards; }
         .as-circle-3 { animation: asCircle ${CYCLE}s ease-in-out ${CYCLE * 2}s forwards, asHideCircle 0s ${CYCLE * 3}s forwards; }
         .as-line-3   { animation: asLine ${CYCLE}s ease-in ${CYCLE * 2}s forwards, asHideLine 0s ${CYCLE * 3}s forwards; }
 
-        @keyframes asHide {
-          to { opacity: 0; }
+        @keyframes asHideCheck {
+          to { stroke-dashoffset: ${CHECK_PATH_LENGTH}; }
         }
         @keyframes asHideCircle {
           to { stroke-dashoffset: ${CIRCUMFERENCE}; }
@@ -172,20 +175,20 @@ export function AutoSave() {
         }
 
         /* Checkpoints 4-5: static (already built), just appear after Part 1 */
-        .as-dot-4    { animation: asShow 0s ${PART2_START}s forwards; }
+        .as-check-4  { animation: asShowCheck 0s ${PART2_START}s forwards; }
         .as-circle-4 { animation: asShowCircle 0s ${PART2_START}s forwards; }
         .as-line-4   { animation: asShowLine 0s ${PART2_START}s forwards; }
-        .as-dot-5    { animation: asShow 0s ${PART2_START}s forwards; }
+        .as-check-5  { animation: asShowCheck 0s ${PART2_START}s forwards; }
         .as-circle-5 { animation: asShowCircle 0s ${PART2_START}s forwards; }
         .as-line-5   { animation: asShowLine 0s ${PART2_START}s forwards; }
 
         /* Checkpoint 6: animates in each loop cycle (same timing as Part 1) */
-        .as-dot-6    { animation: asDotLoop ${CYCLE}s ${PART2_START}s infinite; }
+        .as-check-6  { animation: asCheckLoop ${CYCLE}s ease-in-out ${PART2_START}s infinite; }
         .as-circle-6 { animation: asCircleLoop ${CYCLE}s ease-in-out ${PART2_START}s infinite; }
         .as-line-6   { animation: asLineLoop ${CYCLE}s ease-in ${PART2_START}s infinite; }
 
-        @keyframes asShow {
-          to { opacity: 1; }
+        @keyframes asShowCheck {
+          to { stroke-dashoffset: 0; }
         }
         @keyframes asShowCircle {
           to { stroke-dashoffset: 0; }
@@ -195,9 +198,9 @@ export function AutoSave() {
         }
 
         /* Looping keyframes for Part 2 - same timing as Part 1 but resets at end */
-        @keyframes asDotLoop {
-          0% { opacity: 0; }
-          1%, 100% { opacity: 1; }
+        @keyframes asCheckLoop {
+          0% { stroke-dashoffset: ${CHECK_PATH_LENGTH}; }
+          25%, 100% { stroke-dashoffset: 0; }
         }
         @keyframes asCircleLoop {
           0% { stroke-dashoffset: ${CIRCUMFERENCE}; }
