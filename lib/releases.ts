@@ -16,7 +16,7 @@ export async function getLatestRelease(): Promise<Release | null> {
     if (!releases.length) return null
 
     const latest = releases[0]
-    const macAsset = latest.assets?.find((asset: { name: string }) => asset.name.includes('darwin'))
+    const macAsset = latest.assets?.find((asset: { name: string }) => asset.name.endsWith('.dmg'))
 
     return {
       version: latest.tag_name,
