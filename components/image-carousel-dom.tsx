@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -236,13 +237,21 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Base layer - current image */}
-      <img
-        src={IMAGE_PATHS[currentIndex]}
-        alt=""
-        className="absolute inset-0 w-full h-full object-fill"
-        draggable={false}
-      />
+      {/* Preload all images with priority */}
+      {IMAGE_PATHS.map((path, index) => (
+        <div key={path} className={cn('absolute inset-0', index !== currentIndex && 'invisible')}>
+          <Image
+            src={path}
+            alt=""
+            fill
+            priority
+            quality={100}
+            sizes="100vw"
+            className="object-fill"
+            draggable={false}
+          />
+        </div>
+      ))}
 
       {/* Reveal layer - next image with circular mask */}
       {isTransitioning && nextIndex !== null && clickOrigin && (
@@ -254,10 +263,13 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
               maskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
             }}
           >
-            <img
+            <Image
               src={IMAGE_PATHS[nextIndex]}
               alt=""
-              className="w-full h-full object-fill"
+              fill
+              quality={100}
+              sizes="100vw"
+              className="object-fill"
               draggable={false}
             />
           </div>
