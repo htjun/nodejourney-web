@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 
 import { BodyBackground } from '@/components/body-background'
 import { geistMono, geistSans } from '@/lib/fonts'
@@ -86,6 +87,7 @@ export default function RootLayout({
         <ThemeProvider>
           <BodyBackground>{children}</BodyBackground>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
