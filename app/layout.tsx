@@ -35,10 +35,10 @@ export const metadata: Metadata = {
       'AI image generation canvas with no backend, no logins, no subscriptions. Use your own API keys.',
     images: [
       {
-        url: '/images/app-01.jpg',
-        width: 1400,
-        height: 900,
-        alt: 'Nodejourney app screenshot',
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Nodejourney logo and tagline',
       },
     ],
   },
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     title: 'Nodejourney - AI Image Generation Canvas',
     description: 'AI image generation canvas with no backend, no logins, no subscriptions.',
     creator: '@jsonjun',
-    images: ['/images/app-01.jpg'],
+    images: ['/images/og-image.png'],
   },
   robots: {
     index: true,
