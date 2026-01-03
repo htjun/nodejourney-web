@@ -5,11 +5,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
-const IMAGE_PATHS = [
-  '/images/app-01.jpg',
-  '/images/app-02.jpg',
-  '/images/app-03.jpg',
-  '/images/app-04.jpg',
+const IMAGES = [
+  {
+    path: '/images/app-01.jpg',
+    alt: 'Nodejourney canvas with AI-generated images and node connections',
+  },
+  { path: '/images/app-02.jpg', alt: 'Nodejourney workflow showing image generation pipeline' },
+  { path: '/images/app-03.jpg', alt: 'Nodejourney interface with multiple AI provider options' },
+  { path: '/images/app-04.jpg', alt: 'Nodejourney project with exported image results' },
 ]
 
 const TRANSITION_DURATION = 1600
@@ -159,12 +162,12 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
 
       if (x < zoneWidth) {
         // Go to previous (loop)
-        const prevIdx = (baseIndex - 1 + IMAGE_PATHS.length) % IMAGE_PATHS.length
+        const prevIdx = (baseIndex - 1 + IMAGES.length) % IMAGES.length
         pendingTargetRef.current = prevIdx
         startTransition(prevIdx, { x, y })
       } else if (x > rect.width - zoneWidth) {
         // Go to next (loop)
-        const nextIdx = (baseIndex + 1) % IMAGE_PATHS.length
+        const nextIdx = (baseIndex + 1) % IMAGES.length
         pendingTargetRef.current = nextIdx
         startTransition(nextIdx, { x, y })
       }
@@ -201,7 +204,7 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
       if (isTransitioning) return
 
       // Calculate next index
-      const nextIdx = (currentIndex + 1) % IMAGE_PATHS.length
+      const nextIdx = (currentIndex + 1) % IMAGES.length
       pendingTargetRef.current = nextIdx
 
       // Use bottom-right corner as origin
@@ -238,11 +241,14 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
       onMouseLeave={handleMouseLeave}
     >
       {/* Preload all images with priority */}
-      {IMAGE_PATHS.map((path, index) => (
-        <div key={path} className={cn('absolute inset-0', index !== currentIndex && 'invisible')}>
+      {IMAGES.map((image, index) => (
+        <div
+          key={image.path}
+          className={cn('absolute inset-0', index !== currentIndex && 'invisible')}
+        >
           <Image
-            src={path}
-            alt=""
+            src={image.path}
+            alt={image.alt}
             fill
             priority
             quality={100}
@@ -264,8 +270,8 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
             }}
           >
             <Image
-              src={IMAGE_PATHS[nextIndex]}
-              alt=""
+              src={IMAGES[nextIndex].path}
+              alt={IMAGES[nextIndex].alt}
               fill
               quality={100}
               sizes="100vw"
