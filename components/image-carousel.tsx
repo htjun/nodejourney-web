@@ -1,18 +1,26 @@
 'use client'
 
+import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { IMAGE_THEMES } from '@/lib/data/home'
 import { cn } from '@/lib/utils'
 
-const IMAGE_PATHS = [
-  '/images/app-01.jpg',
-  '/images/app-02.jpg',
-  '/images/app-03.jpg',
-  '/images/app-04.jpg',
+const IMAGES = [
+  { path: '/images/app-05.jpg', alt: 'Nodejourney app screenshot' },
+  {
+    path: '/images/app-01.jpg',
+    alt: 'Nodejourney canvas with AI-generated images and node connections',
+  },
+  { path: '/images/app-02.jpg', alt: 'Nodejourney workflow showing image generation pipeline' },
+  { path: '/images/app-03.jpg', alt: 'Nodejourney interface with multiple AI provider options' },
+  { path: '/images/app-04.jpg', alt: 'Nodejourney project with exported image results' },
 ]
 
 const TRANSITION_DURATION = 1600
 const HOVER_ZONE_WIDTH = 0.5
+const FEATHER_WIDTH = 500
+const AUTO_CHANGE_INTERVAL = 3000
 
 interface Point {
   x: number
@@ -25,206 +33,64 @@ function easeOutCubic(t: number): number {
 
 interface ImageCarouselProps {
   className?: string
+  onIndexChange?: (index: number) => void
 }
 
-export function ImageCarousel({ className }: ImageCarouselProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map())
   const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
-  const snapshotRef = useRef<HTMLCanvasElement | null>(null) // For interrupted transitions
+  const pendingTargetRef = useRef<number>(0)
+  const autoChangeIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const hasUserInteractedRef = useRef(false)
 
-  const [imagesLoaded, setImagesLoaded] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [nextIndex, setNextIndex] = useState<number | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [clickOrigin, setClickOrigin] = useState<Point | null>(null)
   const [progress, setProgress] = useState(0)
   const [cursorSide, setCursorSide] = useState<'left' | 'right' | null>(null)
-  const [resizeCount, setResizeCount] = useState(0)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
-  // Preload images
+  // Track container size
   useEffect(() => {
-    const loadedImages = new Map<string, HTMLImageElement>()
-    let loadedCount = 0
-
-    IMAGE_PATHS.forEach((path) => {
-      const img = new Image()
-      img.onload = () => {
-        loadedImages.set(path, img)
-        loadedCount++
-        if (loadedCount === IMAGE_PATHS.length) {
-          imagesRef.current = loadedImages
-          setImagesLoaded(true)
-        }
+    const updateSize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect()
+        setContainerSize({ width: rect.width, height: rect.height })
       }
-      img.src = path
-    })
+    }
+
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
   }, [])
 
-  // Handle canvas resize
+  // Keep pendingTargetRef in sync when not transitioning
   useEffect(() => {
-    const handleResize = () => {
-      const canvas = canvasRef.current
-      const container = containerRef.current
-      if (!canvas || !container) return
-
-      const rect = container.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      canvas.style.width = `${rect.width}px`
-      canvas.style.height = `${rect.height}px`
-      // Trigger re-render after resize
-      setResizeCount((c) => c + 1)
+    if (!isTransitioning) {
+      pendingTargetRef.current = currentIndex
     }
+  }, [currentIndex, isTransitioning])
 
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Main render function
-  const render = useCallback(() => {
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container || !imagesLoaded) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const dpr = window.devicePixelRatio || 1
-    const width = canvas.width / dpr
-    const height = canvas.height / dpr
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.save()
-    ctx.scale(dpr, dpr)
-
-    const currentImg = imagesRef.current.get(IMAGE_PATHS[currentIndex])
-    if (!currentImg) {
-      ctx.restore()
-      return
-    }
-
-    // Helper to draw image scaled to fill canvas
-    const drawImageFill = (
-      targetCtx: CanvasRenderingContext2D,
-      img: HTMLImageElement,
-      destWidth: number,
-      destHeight: number
-    ) => {
-      targetCtx.drawImage(img, 0, 0, destWidth, destHeight)
-    }
-
-    if (isTransitioning && nextIndex !== null && clickOrigin) {
-      const nextImg = imagesRef.current.get(IMAGE_PATHS[nextIndex])
-      if (!nextImg) {
-        ctx.restore()
-        return
-      }
-
-      const easedProgress = easeOutCubic(progress)
-      const maxRadius = Math.hypot(width, height)
-      const revealRadius = easedProgress * maxRadius * 1.2
-      const featherWidth = 500 // Width of the soft edge
-
-      // Draw current image as base (use snapshot if available, otherwise the actual image)
-      if (snapshotRef.current) {
-        ctx.drawImage(snapshotRef.current, 0, 0, width, height)
-      } else {
-        drawImageFill(ctx, currentImg, width, height)
-      }
-
-      // Only draw the reveal effect once we have a positive radius
-      if (revealRadius > 0) {
-        // Create an offscreen canvas for the next image with gradient mask (at full DPR resolution)
-        const offscreen = document.createElement('canvas')
-        offscreen.width = width * dpr
-        offscreen.height = height * dpr
-        const offCtx = offscreen.getContext('2d')
-        if (offCtx) {
-          // Scale for DPR
-          offCtx.scale(dpr, dpr)
-
-          // Draw next image to offscreen canvas with cover fit
-          drawImageFill(offCtx, nextImg, width, height)
-
-          // Apply radial gradient as mask using destination-in
-          offCtx.globalCompositeOperation = 'destination-in'
-          const innerRadius = Math.max(0, revealRadius - featherWidth)
-          const outerRadius = Math.max(1, revealRadius) // Ensure outer > 0
-          const maskGradient = offCtx.createRadialGradient(
-            clickOrigin.x,
-            clickOrigin.y,
-            innerRadius,
-            clickOrigin.x,
-            clickOrigin.y,
-            outerRadius
-          )
-          maskGradient.addColorStop(0, 'rgba(0, 0, 0, 1)')
-          maskGradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
-          offCtx.fillStyle = maskGradient
-          offCtx.fillRect(0, 0, width, height)
-
-          // Draw the masked next image on top (scale back down for main canvas)
-          ctx.drawImage(offscreen, 0, 0, width, height)
-        }
-      }
-
-      // Draw subtle glow at the edge
-      if (revealRadius > featherWidth) {
-        const glowGradient = ctx.createRadialGradient(
-          clickOrigin.x,
-          clickOrigin.y,
-          Math.max(0, revealRadius - featherWidth - 20),
-          clickOrigin.x,
-          clickOrigin.y,
-          revealRadius + 10
-        )
-        glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0)')
-        glowGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)')
-        glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-        ctx.fillStyle = glowGradient
-        ctx.fillRect(0, 0, width, height)
-      }
-    } else {
-      // Static: draw current image with cover fit
-      drawImageFill(ctx, currentImg, width, height)
-    }
-
-    ctx.restore()
-  }, [imagesLoaded, currentIndex, nextIndex, isTransitioning, clickOrigin, progress, resizeCount])
-
-  // Render on state changes
+  // Notify parent of index changes (when transition starts, not ends)
   useEffect(() => {
-    render()
-  }, [render])
+    if (isTransitioning && nextIndex !== null) {
+      onIndexChange?.(nextIndex)
+    } else if (!isTransitioning) {
+      onIndexChange?.(currentIndex)
+    }
+  }, [currentIndex, nextIndex, isTransitioning, onIndexChange])
 
   // Start transition animation
   const startTransition = useCallback(
     (targetIndex: number, origin: Point) => {
-      // If already transitioning, capture current canvas state as snapshot
-      if (isTransitioning && canvasRef.current) {
-        // Cancel the ongoing animation
+      // If already transitioning, update currentIndex to nextIndex (the revealed image becomes new base)
+      if (isTransitioning && nextIndex !== null) {
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current)
         }
-
-        // Capture current canvas state as snapshot
-        const canvas = canvasRef.current
-        const snapshot = document.createElement('canvas')
-        snapshot.width = canvas.width
-        snapshot.height = canvas.height
-        const snapshotCtx = snapshot.getContext('2d')
-        if (snapshotCtx) {
-          snapshotCtx.drawImage(canvas, 0, 0)
-        }
-        snapshotRef.current = snapshot
-      } else {
-        // Fresh transition - clear any old snapshot
-        snapshotRef.current = null
+        setCurrentIndex(nextIndex)
       }
 
       setNextIndex(targetIndex)
@@ -248,13 +114,12 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
           setIsTransitioning(false)
           setClickOrigin(null)
           setProgress(0)
-          snapshotRef.current = null // Clear snapshot
         }
       }
 
       animationRef.current = requestAnimationFrame(animate)
     },
-    [isTransitioning]
+    [isTransitioning, nextIndex]
   )
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -277,18 +142,15 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
     setCursorSide(null)
   }, [])
 
-  // Track the pending target for rapid clicks (use ref to avoid stale closure)
-  const pendingTargetRef = useRef<number>(currentIndex)
-
-  // Keep pendingTargetRef in sync when not transitioning
-  useEffect(() => {
-    if (!isTransitioning) {
-      pendingTargetRef.current = currentIndex
-    }
-  }, [currentIndex, isTransitioning])
-
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
+      // Stop auto-change on user interaction
+      hasUserInteractedRef.current = true
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+        autoChangeIntervalRef.current = null
+      }
+
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
 
@@ -302,12 +164,12 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
 
       if (x < zoneWidth) {
         // Go to previous (loop)
-        const prevIdx = (baseIndex - 1 + IMAGE_PATHS.length) % IMAGE_PATHS.length
+        const prevIdx = (baseIndex - 1 + IMAGES.length) % IMAGES.length
         pendingTargetRef.current = prevIdx
         startTransition(prevIdx, { x, y })
       } else if (x > rect.width - zoneWidth) {
         // Go to next (loop)
-        const nextIdx = (baseIndex + 1) % IMAGE_PATHS.length
+        const nextIdx = (baseIndex + 1) % IMAGES.length
         pendingTargetRef.current = nextIdx
         startTransition(nextIdx, { x, y })
       }
@@ -321,14 +183,56 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+      }
     }
   }, [])
+
+  // Auto-change effect
+  useEffect(() => {
+    if (hasUserInteractedRef.current) return
+
+    autoChangeIntervalRef.current = setInterval(() => {
+      if (hasUserInteractedRef.current) {
+        if (autoChangeIntervalRef.current) {
+          clearInterval(autoChangeIntervalRef.current)
+          autoChangeIntervalRef.current = null
+        }
+        return
+      }
+
+      // Skip if currently transitioning
+      if (isTransitioning) return
+
+      // Calculate next index
+      const nextIdx = (currentIndex + 1) % IMAGES.length
+      pendingTargetRef.current = nextIdx
+
+      // Use bottom-right corner as origin
+      const origin = { x: containerSize.width, y: containerSize.height }
+      startTransition(nextIdx, origin)
+    }, AUTO_CHANGE_INTERVAL)
+
+    return () => {
+      if (autoChangeIntervalRef.current) {
+        clearInterval(autoChangeIntervalRef.current)
+        autoChangeIntervalRef.current = null
+      }
+    }
+  }, [currentIndex, isTransitioning, containerSize, startTransition])
+
+  // Calculate reveal radius
+  const easedProgress = easeOutCubic(progress)
+  const maxRadius = Math.hypot(containerSize.width, containerSize.height)
+  const revealRadius = easedProgress * (maxRadius + FEATHER_WIDTH + 100)
+  const innerRadius = Math.max(0, revealRadius - FEATHER_WIDTH)
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        'relative w-full aspect-1400/900',
+        'relative w-full aspect-1400/900 overflow-hidden',
         cursorSide === 'left' && 'cursor-w-resize',
         cursorSide === 'right' && 'cursor-e-resize',
         !cursorSide && 'cursor-default',
@@ -338,7 +242,60 @@ export function ImageCarousel({ className }: ImageCarouselProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <canvas ref={canvasRef} className="w-full h-full rounded-xs" />
+      {/* Preload all images with priority */}
+      {IMAGES.map((image, index) => (
+        <div
+          key={image.path}
+          className={cn('absolute inset-0', index !== currentIndex && 'invisible')}
+          style={{
+            background: `linear-gradient(to bottom right, ${IMAGE_THEMES[index].colors[0]}, ${IMAGE_THEMES[index].colors[1]}, ${IMAGE_THEMES[index].colors[2]})`,
+          }}
+        >
+          <Image
+            src={image.path}
+            alt={image.alt}
+            fill
+            priority
+            quality={100}
+            sizes="100vw"
+            className="object-fill"
+            draggable={false}
+          />
+        </div>
+      ))}
+
+      {/* Reveal layer - next image with circular mask */}
+      {isTransitioning && nextIndex !== null && clickOrigin && (
+        <>
+          <div
+            className="absolute inset-0"
+            style={{
+              WebkitMaskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
+              maskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
+            }}
+          >
+            <Image
+              src={IMAGES[nextIndex].path}
+              alt={IMAGES[nextIndex].alt}
+              fill
+              quality={100}
+              sizes="100vw"
+              className="object-fill"
+              draggable={false}
+            />
+          </div>
+
+          {/* Glow overlay at transition edge */}
+          {revealRadius > FEATHER_WIDTH && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, transparent ${Math.max(0, revealRadius - FEATHER_WIDTH - 20)}px, rgba(255,255,255,0.08) ${revealRadius - 10}px, transparent ${revealRadius + 10}px)`,
+              }}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }

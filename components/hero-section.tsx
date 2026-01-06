@@ -1,7 +1,7 @@
 'use client'
 
 import { CtaButton } from '@/components/cta-button'
-import { ImageCarouselDom } from '@/components/image-carousel-dom'
+import { ImageCarousel } from '@/components/image-carousel'
 import { IMAGE_THEMES } from '@/lib/data/home'
 import { useTheme } from '@/lib/theme-context'
 
@@ -28,7 +28,7 @@ export function HeroSection({ downloadUrl, version }: HeroSectionProps) {
         </div>
       </section>
       <section>
-        <ImageCarouselDom className="rounded-xs" onIndexChange={setImageIndex} />
+        <ImageCarousel className="rounded-xs" onIndexChange={setImageIndex} />
       </section>
     </>
   )
