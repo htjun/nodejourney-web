@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const IMAGES = [
+  { path: '/images/app-05.jpg', alt: 'Nodejourney app screenshot' },
   {
     path: '/images/app-01.jpg',
     alt: 'Nodejourney canvas with AI-generated images and node connections',
@@ -13,7 +14,6 @@ const IMAGES = [
   { path: '/images/app-02.jpg', alt: 'Nodejourney workflow showing image generation pipeline' },
   { path: '/images/app-03.jpg', alt: 'Nodejourney interface with multiple AI provider options' },
   { path: '/images/app-04.jpg', alt: 'Nodejourney project with exported image results' },
-  { path: '/images/app-05.jpg', alt: 'Nodejourney app screenshot' },
 ]
 
 const TRANSITION_DURATION = 1600
