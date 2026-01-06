@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { IMAGE_THEMES } from '@/lib/data/home'
 import { cn } from '@/lib/utils'
 
 const IMAGES = [
@@ -246,6 +247,9 @@ export function ImageCarouselDom({ className, onIndexChange }: ImageCarouselDomP
         <div
           key={image.path}
           className={cn('absolute inset-0', index !== currentIndex && 'invisible')}
+          style={{
+            background: `linear-gradient(to bottom right, ${IMAGE_THEMES[index].colors[0]}, ${IMAGE_THEMES[index].colors[1]}, ${IMAGE_THEMES[index].colors[2]})`,
+          }}
         >
           <Image
             src={image.path}
