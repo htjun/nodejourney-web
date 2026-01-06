@@ -13,6 +13,7 @@ const IMAGES = [
   { path: '/images/app-02.jpg', alt: 'Nodejourney workflow showing image generation pipeline' },
   { path: '/images/app-03.jpg', alt: 'Nodejourney interface with multiple AI provider options' },
   { path: '/images/app-04.jpg', alt: 'Nodejourney project with exported image results' },
+  { path: '/images/app-05.jpg', alt: 'Nodejourney app screenshot' },
 ]
 
 const TRANSITION_DURATION = 1600

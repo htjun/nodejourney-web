@@ -58,4 +58,5 @@ export const IMAGE_THEMES = [
   { colors: ['#0C0F12', '#56A473', '#4883D2'] as const, bgColor: '#F6F9F8' }, // app-02.jpg
   { colors: ['#8A629D', '#A76A3E', '#2B306A'] as const, bgColor: '#F8F5FA' }, // app-03.jpg
   { colors: ['#C770A9', '#C04F2B', '#CB687D'] as const, bgColor: '#FAF4F9' }, // app-04.jpg
+  { colors: ['#39458C', '#DA553F', '#304B34'] as const, bgColor: '#F6F6F6' }, // app-05.jpg
 ] as const
