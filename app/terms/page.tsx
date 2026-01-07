@@ -31,7 +31,7 @@ const TERMS = [
   {
     title: 'Privacy',
     content:
-      'The app collects no data. This website uses Vercel Analytics for anonymous page views.',
+      'The app uses Aptabase for anonymous usage analytics. This website uses Vercel Analytics for anonymous page views. No personal data is collected.',
   },
   {
     title: 'Governing Law',
