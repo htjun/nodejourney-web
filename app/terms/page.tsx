@@ -16,7 +16,7 @@ const TERMS = [
   {
     title: 'Limitation of Liability',
     content:
-      'In no event shall the authors be liable for any damages arising from the use of this software. Total liability shall not exceed $0 AUD.',
+      'In no event shall the author be liable for any damages arising from the use of this software.',
   },
   {
     title: 'API Keys',
@@ -26,7 +26,7 @@ const TERMS = [
   {
     title: 'Indemnification',
     content:
-      'You agree to indemnify and hold harmless the authors from any claims arising from your use of the software.',
+      'You agree to indemnify and hold harmless the author from any claims arising from your use of the software.',
   },
   {
     title: 'Privacy',
