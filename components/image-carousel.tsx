@@ -12,9 +12,18 @@ const IMAGES = [
     path: '/images/app-01.jpg',
     alt: 'Nodejourney canvas with AI-generated images and node connections',
   },
-  { path: '/images/app-02.jpg', alt: 'Nodejourney workflow showing image generation pipeline' },
-  { path: '/images/app-03.jpg', alt: 'Nodejourney interface with multiple AI provider options' },
-  { path: '/images/app-04.jpg', alt: 'Nodejourney project with exported image results' },
+  {
+    path: '/images/app-02.jpg',
+    alt: 'Nodejourney workflow showing image generation pipeline',
+  },
+  {
+    path: '/images/app-03.jpg',
+    alt: 'Nodejourney interface with multiple AI provider options',
+  },
+  {
+    path: '/images/app-04.jpg',
+    alt: 'Nodejourney project with exported image results',
+  },
 ]
 
 const TRANSITION_DURATION = 1600
@@ -41,8 +50,8 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
   const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
   const pendingTargetRef = useRef<number>(0)
-  const autoChangeIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const hasUserInteractedRef = useRef(false)
+  const autoProgressAnimationRef = useRef<number | null>(null)
+  const autoProgressStartRef = useRef<number>(0)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [nextIndex, setNextIndex] = useState<number | null>(null)
@@ -51,6 +60,8 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
   const [progress, setProgress] = useState(0)
   const [cursorSide, setCursorSide] = useState<'left' | 'right' | null>(null)
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+  const [autoProgress, setAutoProgress] = useState(0)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
 
   // Track container size
   useEffect(() => {
@@ -97,6 +108,7 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
       setClickOrigin(origin)
       setIsTransitioning(true)
       setProgress(0)
+      setAutoProgress(0)
       startTimeRef.current = performance.now()
 
       const animate = (currentTime: number) => {
@@ -145,10 +157,10 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       // Stop auto-change on user interaction
-      hasUserInteractedRef.current = true
-      if (autoChangeIntervalRef.current) {
-        clearInterval(autoChangeIntervalRef.current)
-        autoChangeIntervalRef.current = null
+      setHasUserInteracted(true)
+      if (autoProgressAnimationRef.current) {
+        cancelAnimationFrame(autoProgressAnimationRef.current)
+        autoProgressAnimationRef.current = null
       }
 
       const rect = containerRef.current?.getBoundingClientRect()
@@ -183,44 +195,52 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
-      if (autoChangeIntervalRef.current) {
-        clearInterval(autoChangeIntervalRef.current)
+      if (autoProgressAnimationRef.current) {
+        cancelAnimationFrame(autoProgressAnimationRef.current)
       }
     }
   }, [])
 
-  // Auto-change effect
+  // Auto-progress animation effect
   useEffect(() => {
-    if (hasUserInteractedRef.current) return
+    if (hasUserInteracted || isTransitioning) {
+      return
+    }
 
-    autoChangeIntervalRef.current = setInterval(() => {
-      if (hasUserInteractedRef.current) {
-        if (autoChangeIntervalRef.current) {
-          clearInterval(autoChangeIntervalRef.current)
-          autoChangeIntervalRef.current = null
-        }
-        return
-      }
+    // Reset progress and start animation
+    setAutoProgress(0)
+    autoProgressStartRef.current = performance.now()
 
-      // Skip if currently transitioning
-      if (isTransitioning) return
+    const animateProgress = (currentTime: number) => {
+      if (hasUserInteracted) return
 
-      // Calculate next index
-      const nextIdx = (currentIndex + 1) % IMAGES.length
-      pendingTargetRef.current = nextIdx
+      const elapsed = currentTime - autoProgressStartRef.current
+      const newProgress = Math.min(elapsed / AUTO_CHANGE_INTERVAL, 1)
 
-      // Use bottom-right corner as origin
-      const origin = { x: containerSize.width, y: containerSize.height }
-      startTransition(nextIdx, origin)
-    }, AUTO_CHANGE_INTERVAL)
+      setAutoProgress(newProgress)
 
-    return () => {
-      if (autoChangeIntervalRef.current) {
-        clearInterval(autoChangeIntervalRef.current)
-        autoChangeIntervalRef.current = null
+      if (newProgress < 1) {
+        autoProgressAnimationRef.current = requestAnimationFrame(animateProgress)
+      } else {
+        // Progress complete, trigger slide transition
+        const nextIdx = (currentIndex + 1) % IMAGES.length
+        pendingTargetRef.current = nextIdx
+
+        // Use bottom-right corner as origin
+        const origin = { x: containerSize.width, y: containerSize.height }
+        startTransition(nextIdx, origin)
       }
     }
-  }, [currentIndex, isTransitioning, containerSize, startTransition])
+
+    autoProgressAnimationRef.current = requestAnimationFrame(animateProgress)
+
+    return () => {
+      if (autoProgressAnimationRef.current) {
+        cancelAnimationFrame(autoProgressAnimationRef.current)
+        autoProgressAnimationRef.current = null
+      }
+    }
+  }, [currentIndex, isTransitioning, hasUserInteracted, containerSize, startTransition])
 
   // Calculate reveal radius
   const easedProgress = easeOutCubic(progress)
@@ -228,74 +248,116 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
   const revealRadius = easedProgress * (maxRadius + FEATHER_WIDTH + 100)
   const innerRadius = Math.max(0, revealRadius - FEATHER_WIDTH)
 
-  return (
-    <div
-      ref={containerRef}
-      className={cn(
-        'relative w-full aspect-1400/900 overflow-hidden',
-        cursorSide === 'left' && 'cursor-w-resize',
-        cursorSide === 'right' && 'cursor-e-resize',
-        !cursorSide && 'cursor-default',
-        className
-      )}
-      onClick={handleClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* Preload all images with priority */}
-      {IMAGES.map((image, index) => (
-        <div
-          key={image.path}
-          className={cn('absolute inset-0', index !== currentIndex && 'invisible')}
-          style={{
-            background: `linear-gradient(to bottom right, ${IMAGE_THEMES[index].colors[0]}, ${IMAGE_THEMES[index].colors[1]}, ${IMAGE_THEMES[index].colors[2]})`,
-          }}
-        >
-          <Image
-            src={image.path}
-            alt={image.alt}
-            fill
-            priority
-            quality={100}
-            sizes="100vw"
-            className="object-fill"
-            draggable={false}
-          />
-        </div>
-      ))}
+  // Determine displayed index for indicator (show target during transition)
+  const displayedIndex = isTransitioning && nextIndex !== null ? nextIndex : currentIndex
 
-      {/* Reveal layer - next image with circular mask */}
-      {isTransitioning && nextIndex !== null && clickOrigin && (
-        <>
+  return (
+    <div className="flex flex-col">
+      <div
+        ref={containerRef}
+        className={cn(
+          'relative w-full aspect-1400/900 overflow-hidden',
+          cursorSide === 'left' && 'cursor-w-resize',
+          cursorSide === 'right' && 'cursor-e-resize',
+          !cursorSide && 'cursor-default',
+          className
+        )}
+        onClick={handleClick}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Preload all images with priority */}
+        {IMAGES.map((image, index) => (
           <div
-            className="absolute inset-0"
+            key={image.path}
+            className={cn('absolute inset-0', index !== currentIndex && 'invisible')}
             style={{
-              WebkitMaskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
-              maskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
+              background: `linear-gradient(to bottom right, ${IMAGE_THEMES[index].colors[0]}, ${IMAGE_THEMES[index].colors[1]}, ${IMAGE_THEMES[index].colors[2]})`,
             }}
           >
             <Image
-              src={IMAGES[nextIndex].path}
-              alt={IMAGES[nextIndex].alt}
+              src={image.path}
+              alt={image.alt}
               fill
+              priority
               quality={100}
               sizes="100vw"
               className="object-fill"
               draggable={false}
             />
           </div>
+        ))}
 
-          {/* Glow overlay at transition edge */}
-          {revealRadius > FEATHER_WIDTH && (
+        {/* Reveal layer - next image with circular mask */}
+        {isTransitioning && nextIndex !== null && clickOrigin && (
+          <>
             <div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0"
               style={{
-                background: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, transparent ${Math.max(0, revealRadius - FEATHER_WIDTH - 20)}px, rgba(255,255,255,0.08) ${revealRadius - 10}px, transparent ${revealRadius + 10}px)`,
+                WebkitMaskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
+                maskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
               }}
-            />
-          )}
-        </>
-      )}
+            >
+              <Image
+                src={IMAGES[nextIndex].path}
+                alt={IMAGES[nextIndex].alt}
+                fill
+                quality={100}
+                sizes="100vw"
+                className="object-fill"
+                draggable={false}
+              />
+            </div>
+
+            {/* Glow overlay at transition edge */}
+            {revealRadius > FEATHER_WIDTH && (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle at ${clickOrigin.x}px ${
+                    clickOrigin.y
+                  }px, transparent ${Math.max(
+                    0,
+                    revealRadius - FEATHER_WIDTH - 20
+                  )}px, rgba(255,255,255,0.08) ${
+                    revealRadius - 10
+                  }px, transparent ${revealRadius + 10}px)`,
+                }}
+              />
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Indicator dots */}
+      <div className="flex justify-center items-center mt-6 gap-1.5">
+        {IMAGES.map((_, index) => {
+          const isSelected = index === displayedIndex
+          const showProgress = isSelected && !hasUserInteracted
+
+          return (
+            <div
+              key={index}
+              className="relative h-1.5 rounded-full transition-all duration-300 ease-out overflow-hidden"
+              style={{
+                width: isSelected ? 28 : 6,
+                backgroundColor: showProgress ? '#CFCFD8' : isSelected ? '#9FA0AC' : '#CFCFD8',
+              }}
+            >
+              {/* Progress bar (only for selected dot, only in auto mode) */}
+              {showProgress && (
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full"
+                  style={{
+                    width: `${autoProgress * 100}%`,
+                    backgroundColor: '#9FA0AC',
+                  }}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
