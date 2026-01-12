@@ -36,9 +36,17 @@ interface Point {
   y: number
 }
 
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3)
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+
+const cancelAnimation = (ref: React.MutableRefObject<number | null>) => {
+  if (ref.current) {
+    cancelAnimationFrame(ref.current)
+    ref.current = null
+  }
 }
+
+const createRadialGradient = (origin: Point, stops: string) =>
+  `radial-gradient(circle at ${origin.x}px ${origin.y}px, ${stops})`
 
 interface ImageCarouselProps {
   className?: string
@@ -98,9 +106,7 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
     (targetIndex: number, origin: Point) => {
       // If already transitioning, update currentIndex to nextIndex (the revealed image becomes new base)
       if (isTransitioning && nextIndex !== null) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current)
-        }
+        cancelAnimation(animationRef)
         setCurrentIndex(nextIndex)
       }
 
@@ -158,10 +164,7 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
     (e: React.MouseEvent) => {
       // Stop auto-change on user interaction
       setHasUserInteracted(true)
-      if (autoProgressAnimationRef.current) {
-        cancelAnimationFrame(autoProgressAnimationRef.current)
-        autoProgressAnimationRef.current = null
-      }
+      cancelAnimation(autoProgressAnimationRef)
 
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
@@ -192,12 +195,8 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-      if (autoProgressAnimationRef.current) {
-        cancelAnimationFrame(autoProgressAnimationRef.current)
-      }
+      cancelAnimation(animationRef)
+      cancelAnimation(autoProgressAnimationRef)
     }
   }, [])
 
@@ -234,12 +233,7 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
 
     autoProgressAnimationRef.current = requestAnimationFrame(animateProgress)
 
-    return () => {
-      if (autoProgressAnimationRef.current) {
-        cancelAnimationFrame(autoProgressAnimationRef.current)
-        autoProgressAnimationRef.current = null
-      }
-    }
+    return () => cancelAnimation(autoProgressAnimationRef)
   }, [currentIndex, isTransitioning, hasUserInteracted, containerSize, startTransition])
 
   // Calculate reveal radius
@@ -294,8 +288,14 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
             <div
               className="absolute inset-0"
               style={{
-                WebkitMaskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
-                maskImage: `radial-gradient(circle at ${clickOrigin.x}px ${clickOrigin.y}px, black ${innerRadius}px, transparent ${revealRadius}px)`,
+                WebkitMaskImage: createRadialGradient(
+                  clickOrigin,
+                  `black ${innerRadius}px, transparent ${revealRadius}px`
+                ),
+                maskImage: createRadialGradient(
+                  clickOrigin,
+                  `black ${innerRadius}px, transparent ${revealRadius}px`
+                ),
               }}
             >
               <Image
@@ -314,14 +314,10 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: `radial-gradient(circle at ${clickOrigin.x}px ${
-                    clickOrigin.y
-                  }px, transparent ${Math.max(
-                    0,
-                    revealRadius - FEATHER_WIDTH - 20
-                  )}px, rgba(255,255,255,0.08) ${
-                    revealRadius - 10
-                  }px, transparent ${revealRadius + 10}px)`,
+                  background: createRadialGradient(
+                    clickOrigin,
+                    `transparent ${Math.max(0, revealRadius - FEATHER_WIDTH - 20)}px, rgba(255,255,255,0.08) ${revealRadius - 10}px, transparent ${revealRadius + 10}px`
+                  ),
                 }}
               />
             )}
@@ -332,26 +328,20 @@ export function ImageCarousel({ className, onIndexChange }: ImageCarouselProps) 
       {/* Indicator dots */}
       <div className="flex justify-center items-center mt-6 gap-1.5">
         {IMAGES.map((_, index) => {
-          const isSelected = index === displayedIndex
-          const showProgress = isSelected && !hasUserInteracted
+          const isActive = index === displayedIndex
+          const showProgress = isActive && !hasUserInteracted
+          const bgColor = isActive && !showProgress ? '#9FA0AC' : '#CFCFD8'
 
           return (
             <div
               key={index}
               className="relative h-1.5 rounded-full transition-all duration-300 ease-out overflow-hidden"
-              style={{
-                width: isSelected ? 28 : 6,
-                backgroundColor: showProgress ? '#CFCFD8' : isSelected ? '#9FA0AC' : '#CFCFD8',
-              }}
+              style={{ width: isActive ? 28 : 6, backgroundColor: bgColor }}
             >
-              {/* Progress bar (only for selected dot, only in auto mode) */}
               {showProgress && (
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full"
-                  style={{
-                    width: `${autoProgress * 100}%`,
-                    backgroundColor: '#9FA0AC',
-                  }}
+                  className="absolute inset-y-0 left-0 rounded-full bg-[#9FA0AC]"
+                  style={{ width: `${autoProgress * 100}%` }}
                 />
               )}
             </div>
